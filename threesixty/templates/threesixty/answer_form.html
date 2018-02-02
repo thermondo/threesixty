@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block body %}
+    <body>
+    <div class="w3-bar w3-amber w3-text-white">
+        <h2 class="w3-center">{{ name }}</h2>
+    </div>
+    <form method="POST" style="display: none">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </form>
+
+    <div class="swipe-container">
+        <div class="question-wrapper">
+            <h3 class="no">{% trans 'no' %}</h3>
+            <div class="question">
+                <h1>{{ statement }}</h1>
+            </div>
+            <h3 class="yes">{% trans 'yes' %}</h3>
+        </div>
+    </div>
+
+    <p class="help desktop">
+        {% trans 'Use your keyboard to answer:' %}
+        <span class="key up">{% trans 'yes' %}</span>
+        <span class="key down">{% trans 'no' %}</span>
+    </p>
+    <p class="help mobile">
+        {% trans 'Swipe to up and down to reply.' %}
+    </p>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
+    <script src="{% static 'threesixty/survey.js' %}"></script>
+    </body>
+{% endblock %}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Polario">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Polario">
+    <meta name="theme-color" content="#ffc107">
+
+    <link rel="icon" type="image/png" href="{% static 'threesixty/thermondo-circle-16.png' %}" sizes="16x16">
+    <link rel="icon" type="image/png" href="{% static 'threesixty/thermondo-circle-32.png' %}" sizes="32x32">
+    <link rel="icon" type="image/png" href="{% static 'threesixty/thermondo-circle-64.png' %}" sizes="64x64">
+    <link rel="icon" type="image/png" href="{% static 'threesixty/thermondo-circle-128.png' %}" sizes="128x128">
+
+    <title>ThreeSixty&deg;</title>
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="{% static 'threesixty/survey.css' %}">
+</head>
+{% block body %}
+    <body>
+    <div class="w3-top">
+        <div class="w3-bar w3-amber w3-text-white">
+            <h1 class="w3-center brand-logo">ThreeSixty&deg;</h1>
+        </div>
+    </div>
+    <br><br><br><br class="w3-hide-small w3-hide-medium">
+    {% block content %}
+
+    {% endblock %}
+    <div class="home-wrapper">
+    </div>
+    </body>
+{% endblock %}
+</html>

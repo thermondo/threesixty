@@ -1,0 +1,10 @@
+Hi there!
+
+I have created a 360-degree feedback survey for you.
+
+You can check the response status and invite participants here.
+
+Just follow the url:
+{{ survey_url }}
+
+Cheers!

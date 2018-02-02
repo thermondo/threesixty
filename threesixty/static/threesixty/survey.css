@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed");
+.home-wrapper {
+  background: linear-gradient(to bottom right, darkcyan, darkslateblue);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -10; }
+
+.brand-logo {
+  font-family: 'Roboto Condensed', sans-serif; }
+
+.question-wrapper {
+  touch-action: None;
+  position: fixed;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%; }
+  .question-wrapper .question {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; }
+  .question-wrapper .question h1 {
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+    padding: 4rem 0; }
+  .question-wrapper .yes, .question-wrapper .no {
+    position: absolute;
+    height: 0;
+    width: 100%;
+    overflow: hidden;
+    color: white;
+    margin: 0;
+    line-height: 1.5em;
+    text-align: center;
+    z-index: 100; }
+  .question-wrapper .yes, .question-wrapper .no {
+    text-transform: uppercase; }
+    .question-wrapper .yes:after, .question-wrapper .no:after {
+      content: '!'; }
+  .question-wrapper .yes {
+    background: yellowgreen;
+    background: linear-gradient(to bottom right, yellowgreen, yellow);
+    bottom: 0; }
+  .question-wrapper .no {
+    background-color: orangered;
+    background: linear-gradient(to bottom right, orangered, orange);
+    top: 0; }
+
+@media screen and (max-width: 600px) {
+  .question-wrapper {
+    top: 56px; } }
+
+.key {
+  margin: 15px;
+  vertical-align: bottom; }
+
+.key.up {
+  color: green; }
+
+.key.down {
+  color: orangered; }
+
+.key:before {
+  color: #999;
+  margin-right: 10px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  font-weight: 900;
+  text-align: center;
+  line-height: 30px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(0, 0, 0, 0.2);
+  background-color: white; }
+
+.key.up:before {
+  content: '\2191'; }
+
+.key.down:before {
+  content: '\2193'; }
+
+.help {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  text-align: center;
+  color: #999; }
+
+@media screen and (max-width: 600px) {
+  .key {
+    display: none; }
+  .desktop {
+    display: none; } }
+
+@media screen and (min-width: 600px) {
+  .mobile {
+    display: none; } }

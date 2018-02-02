@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="w3-card w3-panel w3-content w3-card-4 w3-white">
+        <h2>the 360-degree feedback tool</h2>
+
+        <p>Create simple binary surveys for you employee 360 feedback sessions.</p>
+        <p class="w3-bar">
+            <a class="w3-button w3-teal w3-right" href="{% url 'survey-create' %}">Create Survey &nbsp; ❯</a>
+        </p>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="w3-card w3-content w3-container w3-white">
+        <h3>Details</h3>
+        <dl>
+            <dt>Employee:</dt>
+            <dd> {{ object.employee_name }}</dd>
+
+            <dt>Employee Email:</dt>
+            <dd> {{ object.employee_email }}</dd>
+
+            <dt>Manager:</dt>
+            <dd>{{ object.manager_email }}</dd>
+
+        </dl>
+        <h3>Participants</h3>
+        {% for participant in object.participant_set.all %}
+            <p>{{ participant.email }}
+                ({{ participant.relation }})
+                {% if participant.survey_completed %}
+                    <small class="w3-tag w3-green">completed</small>
+                {% else %}
+                    <small class="w3-tag w3-amber">pending</small>
+                {% endif %}
+            </p>
+        {% empty %}
+            <p>No participants invited yet.</p>
+        {% endfor %}
+        <p>
+            <a class="w3-btn w3-teal" href="{% url 'survey-invite' survey_pk=object.pk token=token %}">Invite More
+                &nbsp; ❯</a>
+        </p>
+    </div>
+{% endblock %}

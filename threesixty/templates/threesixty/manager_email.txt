@@ -1,0 +1,8 @@
+Hi!
+
+You have created a 360-degree feedback survey for {{ employee_name }}.
+
+You can check the response status and invite more participants here:
+{{ survey_url }}
+
+Cheers!

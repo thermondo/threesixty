@@ -1,0 +1,10 @@
+Hi there!
+
+I'd like you to participate in the 360-degree feedback for {{ employee_name }}.
+It would really help {{ employee_name }} and me. So how about doing it right now?
+It only takes a minute, promise!
+
+Just follow the link below:
+{{ survey_url }}
+
+Thanks!
