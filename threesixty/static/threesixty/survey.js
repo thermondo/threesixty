@@ -50,9 +50,9 @@ class Question {
   swipeStatus (event, phase, direction, distance) {
     if (phase === 'move') {
       if (direction === 'down') {
-        this.$no.css('height', distance)
+        this.$no.css('height', distance * 1.5)
       } else if (direction === 'up') {
-        this.$yes.css('height', distance)
+        this.$yes.css('height', distance * 1.5)
       }
     } else if (phase === 'cancel') {
       this.$yes.height(0)
