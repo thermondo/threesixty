@@ -12,4 +12,4 @@ class SurveyAdmin(admin.ModelAdmin):
     inlines = [ParticipantInlineAdmin]
 
 
-admin.register(models.Question)
+admin.site.register(models.Question)
