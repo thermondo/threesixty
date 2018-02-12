@@ -27,7 +27,7 @@ We also added cat pictures as rewards to keep participants happy.
 
 ### Science
 
-360-degree surveys can be a great tools when performed correctly.
+360-degree surveys can be great tools when performed correctly.
 If they are not, you risk that the recipients of constructive feedback
 will not fully accept the feedback or worse go into
 [denial](https://en.wikipedia.org/wiki/Denial).
@@ -62,9 +62,9 @@ Further reading:
 
 ThreeSixty is a yes-no (polar) survey tool. This does not compromise your data
 quality. Polar surveys can increase response rates and participant satisfaction.
-This allows them to yield better results than other survey techniques surveys.
+This allows them to yield better results than other survey techniques.
 
-Bare in mind that questions are not interpreted separately but as a whole for
+Bear in mind that questions are not interpreted separately but as a whole for
 a given attribute. You do not survey for individual statements but a small
 set of attributes.
 
