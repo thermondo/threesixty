@@ -1,3 +1,4 @@
+const $ = window.$
 class Question {
   constructor () {
     this.answered = false
@@ -70,4 +71,4 @@ class Question {
   }
 }
 
-$(() => { new Question() })
+$(() => { window.question = new Question() })
