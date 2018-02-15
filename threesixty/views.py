@@ -56,15 +56,21 @@ class SurveyViewMixin:
             survey_pk = self.kwargs['survey_pk']
         except KeyError:
             raise Http404
-        return get_object_or_404(models.Survey, pk=survey_pk)
+        return get_object_or_404(models.Survey, pk=survey_pk, is_complete=False)
 
 
 class SurveyDetailView(EmployeeRequiredMixin, generic.DetailView):
     model = models.Survey
 
 
-class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
+class SurveyUpdateView(EmployeeRequiredMixin, generic.UpdateView):
     model = models.Survey
+    fields = ['is_complete']
+    template_name_suffix = '_detail'
+
+
+class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
+    queryset = models.Survey.objects.filter(is_complete=True)
     survey_results = """
         WITH results AS (
             SELECT
@@ -200,7 +206,12 @@ class ParticipantCreateView(EmployeeRequiredMixin, SurveyViewMixin, generic.Crea
 
 class SurveyCreateView(generic.CreateView):
     model = models.Survey
-    fields = '__all__'
+    fields = [
+        'employee_name',
+        'employee_email',
+        'employee_gender',
+        'manager_email',
+    ]
 
     def form_valid(self, form):
         response = super().form_valid(form=form)
