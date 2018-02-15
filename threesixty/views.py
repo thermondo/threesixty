@@ -82,23 +82,7 @@ class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
             JOIN threesixty_participant p
               ON p.id = a.participant_id
             WHERE s.id = %s
-        )
-        SELECT
-          relation,
-          attribute,
-          avg(score) AS avg_score
-        FROM results
-        GROUP BY relation, attribute
-        UNION ALL
-        SELECT
-          'total' AS relation,
-          attribute,
-          avg(score) AS avg_score
-        FROM results
-        GROUP BY attribute;
-    """
-    benchmark_results = """
-        WITH results AS (
+        ), benchmark_results AS (
             SELECT
               p.relation AS relation,
               q.attribute AS attribute,
@@ -117,7 +101,7 @@ class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
         SELECT
           relation,
           attribute,
-          avg(score)::FLOAT AS avg_score
+          avg(score) AS avg_score
         FROM results
         GROUP BY relation, attribute
         UNION ALL
@@ -126,8 +110,26 @@ class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
           attribute,
           avg(score) AS avg_score
         FROM results
+        WHERE relation != 'self'
+        GROUP BY attribute
+        UNION ALL
+        SELECT
+          'benchmark' AS relation,
+          attribute,
+          avg(score) AS avg_score
+        FROM benchmark_results
+        WHERE relation != 'self'
         GROUP BY attribute;
     """
+
+    colors = {
+        'supervisor': 'rgba(255, 0, 0, 0.5)',
+        'subordinate': 'rgba(255, 255, 0, 0.5)',
+        'peer': 'rgba(0, 0, 255, 0.5)',
+        'self': 'rgba(0, 255, 255, 0.5)',
+        'total': 'rgba(255, 0, 255, 0.5)',
+        'benchmark': 'rgba(0, 0, 0, 0.25)',
+    }
 
     def get_results(self):
         with connection.cursor() as cursor:
@@ -139,22 +141,25 @@ class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
             data[relation][attribute] = value
         return data
 
-    def get_benchmark(self):
-        with connection.cursor() as cursor:
-            cursor.execute(self.benchmark_results)
-            survey_data = cursor.fetchall()
-
-        data = defaultdict(dict)
-        for relation, attribute, value in survey_data:
-            data[relation][attribute] = value
-        return data
+    def transform_to_chart_js(self, data):
+        labels = list(list(data.values())[0].keys())
+        datasets = []
+        for attr, values in data.items():
+            dataset = [
+                values[label]
+                for label in labels
+            ]
+            datasets.append(
+                {'label': attr, 'data': dataset, 'backgroundColor': self.colors[attr]}
+            )
+        return {
+            'labels': labels,
+            'datasets': datasets
+        }
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        data = {
-            'restults': self.get_results(),
-            'benchmark': self.get_benchmark(),
-        }
+        data = self.transform_to_chart_js(self.get_results())
         return JsonResponse(
             data,
             json_dumps_params=dict(default=lambda o: float(o) if isinstance(o, Decimal) else o),

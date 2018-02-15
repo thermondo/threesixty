@@ -13,6 +13,8 @@
             <dd>{{ object.manager_email }}</dd>
 
         </dl>
+        <h3>Stats</h3>
+        <canvas id="chart-results"></canvas>
         <h3>Participants</h3>
         {% for participant in object.participant_set.all %}
             <p>{{ participant.email }}
@@ -31,4 +33,23 @@
                 &nbsp; ❯</a>
         </p>
     </div>
+{% endblock %}
+
+{% block js_bottom %}
+    {{ block.super }}
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script type="application/javascript">
+      $(() => {
+        $.ajax({
+          url: "{% url 'survey-data' pk=object.pk token=token %}",
+          success: (data) => {
+            let resultCart = new Chart($('#chart-results'), {
+              type: 'radar',
+              data: data,
+            })
+          }
+        })
+      })
+    </script>
 {% endblock %}
