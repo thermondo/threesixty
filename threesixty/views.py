@@ -1,17 +1,17 @@
 import random
+from collections import defaultdict
+from decimal import Decimal
 
 from django.core import signing
 from django.core.mail import send_mail
-from django.db.models import Avg, FloatField, IntegerField
-from django.db.models.functions import Cast
-from django.http import Http404, HttpResponseRedirect
+from django.db import connection
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views import generic
 
-from . import forms
-from . import models
+from . import forms, models
 
 
 class WithEmailTokenMixin:
@@ -61,6 +61,104 @@ class SurveyViewMixin:
 
 class SurveyDetailView(EmployeeRequiredMixin, generic.DetailView):
     model = models.Survey
+
+
+class SurveyDataView(EmployeeRequiredMixin, generic.DetailView):
+    model = models.Survey
+    survey_results = """
+        WITH results AS (
+            SELECT
+              p.relation AS relation,
+              q.attribute AS attribute,
+            CASE
+              WHEN q.connotation THEN a.decision::INT
+              ELSE 1 - a.decision::INT
+            END AS score
+            FROM threesixty_answer a
+            JOIN threesixty_survey s
+              ON s.id = a.survey_id
+            JOIN threesixty_question q
+              ON q.id = a.question_id
+            JOIN threesixty_participant p
+              ON p.id = a.participant_id
+            WHERE s.id = %s
+        )
+        SELECT
+          relation,
+          attribute,
+          avg(score) AS avg_score
+        FROM results
+        GROUP BY relation, attribute
+        UNION ALL
+        SELECT
+          'total' AS relation,
+          attribute,
+          avg(score) AS avg_score
+        FROM results
+        GROUP BY attribute;
+    """
+    benchmark_results = """
+        WITH results AS (
+            SELECT
+              p.relation AS relation,
+              q.attribute AS attribute,
+            CASE
+              WHEN q.connotation THEN a.decision::INT
+              ELSE 1 - a.decision::INT
+            END AS score
+            FROM threesixty_answer a
+            JOIN threesixty_survey s
+              ON s.id = a.survey_id
+            JOIN threesixty_question q
+              ON q.id = a.question_id
+            JOIN threesixty_participant p
+              ON p.id = a.participant_id
+        )
+        SELECT
+          relation,
+          attribute,
+          avg(score)::FLOAT AS avg_score
+        FROM results
+        GROUP BY relation, attribute
+        UNION ALL
+        SELECT
+          'total' AS relation,
+          attribute,
+          avg(score) AS avg_score
+        FROM results
+        GROUP BY attribute;
+    """
+
+    def get_results(self):
+        with connection.cursor() as cursor:
+            cursor.execute(self.survey_results, params=[self.object.pk])
+            survey_data = cursor.fetchall()
+
+        data = defaultdict(dict)
+        for relation, attribute, value in survey_data:
+            data[relation][attribute] = value
+        return data
+
+    def get_benchmark(self):
+        with connection.cursor() as cursor:
+            cursor.execute(self.benchmark_results)
+            survey_data = cursor.fetchall()
+
+        data = defaultdict(dict)
+        for relation, attribute, value in survey_data:
+            data[relation][attribute] = value
+        return data
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        data = {
+            'restults': self.get_results(),
+            'benchmark': self.get_benchmark(),
+        }
+        return JsonResponse(
+            data,
+            json_dumps_params=dict(default=lambda o: float(o) if isinstance(o, Decimal) else o),
+        )
 
 
 class ParticipantCreateView(EmployeeRequiredMixin, SurveyViewMixin, generic.CreateView):
