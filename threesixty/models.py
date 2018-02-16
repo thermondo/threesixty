@@ -20,7 +20,7 @@ class Survey(models.Model):
                                       help_text=_('Will show results and reject further answers.'))
     participant_can_skip = models.BooleanField(
         'participant can skip',
-        default=True,
+        default=False,
         help_text=_('This option allows a participant of this survey to skip single questions.')
     )
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
