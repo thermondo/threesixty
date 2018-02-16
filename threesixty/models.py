@@ -18,6 +18,11 @@ class Survey(models.Model):
     manager_email = models.EmailField(_('manager email'))
     is_complete = models.BooleanField(_('is complete'), default=False,
                                       help_text=_('Will show results and reject further answers.'))
+    participant_can_skip = models.BooleanField(
+        'participant can skip',
+        default=True,
+        help_text=_('This option allows a participant of this survey to skip single questions.')
+    )
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
 
     def __str__(self):
@@ -63,7 +68,7 @@ class Question(models.Model):
 class Answer(models.Model):
     survey = models.ForeignKey('Survey', on_delete=models.CASCADE)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    decision = models.BooleanField(_('decision'))
+    decision = models.NullBooleanField(_('decision'))
     participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
 

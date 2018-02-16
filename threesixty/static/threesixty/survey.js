@@ -1,17 +1,21 @@
 const $ = window.$
 class Question {
-  constructor () {
+  constructor (userCanSkip) {
     this.answered = false
     this.submitNo = this.submitNo.bind(this)
     this.submitYes = this.submitYes.bind(this)
+    this.submitSkip = this.submitSkip.bind(this)
     this.reset = this.reset.bind(this)
     this.swipeStatus = this.swipeStatus.bind(this)
     this.$yes = $('.yes')
-    this.checkbox = $('input[type="checkbox"]')
+    this.select = $('#id_decision')
+    this.select.find('option[value="1"]').removeAttr('selected')
     this.form = $('form')[0]
     this.$no = $('.no')
+    this.$skip = $('.skip')
     this.$body = $('.question-wrapper')
     this.$body.swipe(this)
+    this.userCanSkip = userCanSkip
     $(document).on('keydown', e => {
       if (!$('#search:focus').length) {
         if (!this.answered) {
@@ -24,6 +28,11 @@ class Question {
             this.submitNo()
             return false
           }
+
+          if (e.keyCode === 39 && this.userCanSkip) {  // right
+            this.submitSkip()
+            return false
+          }
         }
       }
     })
@@ -31,21 +40,32 @@ class Question {
 
   submitNo () {
     this.answered = true
-    this.checkbox.attr('checked', false)
+    this.select.find('option[value="3"]').attr('selected', 'selected').parent().trigger('change') // 1 = Yes
     this.$yes.height(0)
+    this.$skip.width(0)
     this.$no.animate({height: '100%'}, {duration: 250, start: this.$no.height(), complete: () => this.form.submit()})
   }
 
   submitYes () {
     this.answered = true
-    this.checkbox.attr('checked', true)
+    this.select.find('option[value="2"]').attr('selected', 'selected').parent().trigger('change') // 2 = No
     this.$no.height(0)
+    this.$skip.width(0)
     this.$yes.animate({height: '100%'}, {duration: 250, start: this.$yes.height(), complete: () => this.form.submit()})
+  }
+
+  submitSkip () {
+    this.answered = true
+    this.select.find('option[value="1"]').attr('selected', 'selected').parent().trigger('change') // 1 = Unknown == skip
+    this.$no.height(0)
+    this.$yes.height(0)
+    this.$skip.animate({left: '0%', width: '100%'}, {duration: 250, start: this.$skip.width(), complete: () => this.form.submit()})
   }
 
   reset () {
     this.$yes.animate({height: '0'}, 100)
     this.$no.animate({height: '0'}, 100)
+    this.$skip.animate({height: '0'}, 100)
   }
 
   swipeStatus (event, phase, direction, distance) {
@@ -54,15 +74,21 @@ class Question {
         this.$no.css('height', distance * 1.5)
       } else if (direction === 'up') {
         this.$yes.css('height', distance * 1.5)
+      } else if (direction === 'left') {
+        this.$skip.css('left', $(window).width() - distance * 1.5)
+        this.$skip.css('width', distance * 1.5)
       }
     } else if (phase === 'cancel') {
       this.$yes.height(0)
       this.$no.height(0)
+      this.$skip.width(0)
     } else if (phase === 'end') {
       if ((direction === 'down') && (distance > (window.innerHeight / 3))) {
         this.submitNo()
       } else if ((direction === 'up') && (distance > (window.innerHeight / 3))) {
         this.submitYes()
+      } else if ((direction === 'left') && (distance > (window.innerWidth / 3)) && this.userCanSkip) {
+        this.submitSkip()
       } else {
         this.reset()
       }
@@ -70,5 +96,3 @@ class Question {
     event.preventDefault()
   }
 }
-
-$(() => { window.question = new Question() })
