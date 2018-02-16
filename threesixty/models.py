@@ -16,6 +16,8 @@ class Survey(models.Model):
     employee_gender = models.CharField(_('employee gender'), max_length=6, choices=GENDERS, default='other')
     employee_email = models.EmailField(_('employee email'))
     manager_email = models.EmailField(_('manager email'))
+    is_complete = models.BooleanField(_('is complete'), default=False,
+                                      help_text=_('Will show results and reject further answers.'))
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
 
     def __str__(self):

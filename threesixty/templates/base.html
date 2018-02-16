@@ -18,8 +18,10 @@
 
     <title>ThreeSixty&deg;</title>
 
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="{% static 'threesixty/survey.css' %}">
+    {% block css %}
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="{% static 'threesixty/survey.css' %}">
+    {% endblock %}
 </head>
 {% block body %}
     <body>
@@ -36,6 +38,8 @@
     {% endblock %}
     <div class="home-wrapper">
     </div>
+    {% block js_bottom %}
+    {% endblock %}
     </body>
 {% endblock %}
 </html>

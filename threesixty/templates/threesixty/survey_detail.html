@@ -13,22 +13,60 @@
             <dd>{{ object.manager_email }}</dd>
 
         </dl>
-        <h3>Participants</h3>
-        {% for participant in object.participant_set.all %}
-            <p>{{ participant.email }}
-                ({{ participant.relation }})
-                {% if participant.survey_completed %}
-                    <small class="w3-tag w3-green">completed</small>
-                {% else %}
-                    <small class="w3-tag w3-amber">pending</small>
-                {% endif %}
+        {% if form %}
+            <form method="POST">
+                {% csrf_token %}
+                {{ form }}
+                <p>
+                    <button type="submit" class="w3-btn w3-padding w3-teal" style="width:120px">Save</button>
+                </p>
+            </form>
+        {% endif %}
+        {% if object.is_complete %}
+            <h3>Stats</h3>
+            <canvas id="chart-results"></canvas>
+        {% else %}
+            <h3>Participants</h3>
+            {% for participant in object.participant_set.all %}
+                <p>{{ participant.email }}
+                    ({{ participant.relation }})
+                    {% if participant.survey_completed %}
+                        <small class="w3-tag w3-green">completed</small>
+                    {% else %}
+                        <small class="w3-tag w3-amber">pending</small>
+                    {% endif %}
+                </p>
+            {% empty %}
+                <p>No participants invited yet.</p>
+            {% endfor %}
+            <p>
+                <a class="w3-btn w3-teal" href="{% url 'survey-invite' survey_pk=object.pk token=token %}">
+                    Invite More &nbsp; ❯
+                </a>
             </p>
-        {% empty %}
-            <p>No participants invited yet.</p>
-        {% endfor %}
-        <p>
-            <a class="w3-btn w3-teal" href="{% url 'survey-invite' survey_pk=object.pk token=token %}">Invite More
-                &nbsp; ❯</a>
-        </p>
+        {% endif %}
     </div>
+{% endblock %}
+
+{% block js_bottom %}
+    {{ block.super }}
+    {% if object.is_complete %}
+        <script type="application/javascript"
+                src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="application/javascript"
+                src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+        <script type="application/javascript">
+          $(() => {
+            $.ajax({
+              url: "{% url 'survey-data' pk=object.pk token=token %}",
+              success: (data) => {
+                let resultCart = new Chart($('#chart-results'), {
+                  type: 'radar',
+                  data: data,
+                })
+              }
+            })
+          })
+        </script>
+    {% endif %}
 {% endblock %}
