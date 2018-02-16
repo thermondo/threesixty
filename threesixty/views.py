@@ -63,7 +63,7 @@ class SurveyDetailView(EmployeeRequiredMixin, generic.DetailView):
     model = models.Survey
 
 
-class SurveyUpdateView(EmployeeRequiredMixin, generic.UpdateView):
+class SurveyUpdateView(ManagerRequiredMixin, generic.UpdateView):
     model = models.Survey
     fields = ['is_complete']
     template_name_suffix = '_detail'
