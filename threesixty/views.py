@@ -212,6 +212,7 @@ class SurveyCreateView(generic.CreateView):
         'employee_email',
         'employee_gender',
         'manager_email',
+        'participant_can_skip'
     ]
 
     def form_valid(self, form):
