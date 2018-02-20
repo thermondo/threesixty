@@ -5,7 +5,8 @@ from decimal import Decimal
 from django.core import signing
 from django.core.mail import send_mail
 from django.db import connection
-from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
+from django.db.models import Avg, FloatField, IntegerField
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -211,6 +212,7 @@ class SurveyCreateView(generic.CreateView):
         'employee_email',
         'employee_gender',
         'manager_email',
+        'participant_can_skip'
     ]
 
     def form_valid(self, form):
@@ -278,6 +280,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         context = super().get_context_data(**kwargs)
         context['name'] = self.survey.employee_name
         context['statement'] = self.question.get_display(self.survey)
+        context['can_skip'] = self.survey.participant_can_skip
         return context
 
     def get_initial(self):
@@ -287,6 +290,8 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         return initial
 
     def form_valid(self, form):
+        if not self.survey.participant_can_skip and form.cleaned_data['decision'] is None:
+            return HttpResponseForbidden()
         self.object = form.save(commit=False)
         self.object.participant = self.participant
         self.object.survey = self.survey

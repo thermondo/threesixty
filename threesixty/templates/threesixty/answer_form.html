@@ -18,6 +18,9 @@
                 <h1>{{ statement }}</h1>
             </div>
             <h3 class="yes">{% trans 'yes' %}</h3>
+            {% if can_skip %}
+            <h3 class="skip">{% trans 'skip' %}</h3>
+            {% endif %}
         </div>
     </div>
 
@@ -25,6 +28,9 @@
         {% trans 'Use your keyboard to answer:' %}
         <span class="key up">{% trans 'yes' %}</span>
         <span class="key down">{% trans 'no' %}</span>
+        {% if can_skip %}
+        <span class="key right">{% trans 'skip' %}</span>
+        {% endif %}
     </p>
     <p class="help mobile">
         {% trans 'Swipe to up and down to reply.' %}
@@ -33,5 +39,8 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
     <script src="{% static 'threesixty/survey.js' %}"></script>
+    <script>
+        $(() => window.question = new Question({userCanSkip:("{{can_skip}}"  === 'True')}) )
+    </script>
     </body>
 {% endblock %}

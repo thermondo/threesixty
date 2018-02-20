@@ -34,18 +34,19 @@
     overflow: hidden;
     padding: 4rem 0; }
   .question-wrapper .yes, .question-wrapper .no {
-    position: absolute;
     height: 0;
-    width: 100%;
+    width: 100%; }
+  .question-wrapper .yes, .question-wrapper .no, .question-wrapper .skip {
+    position: absolute;
     overflow: hidden;
     color: white;
     margin: 0;
     line-height: 1.5em;
     text-align: center;
     z-index: 100; }
-  .question-wrapper .yes, .question-wrapper .no {
+  .question-wrapper .yes, .question-wrapper .no, .question-wrapper .skip {
     text-transform: uppercase; }
-    .question-wrapper .yes:after, .question-wrapper .no:after {
+    .question-wrapper .yes:after, .question-wrapper .no:after, .question-wrapper .skip:after {
       content: '!'; }
   .question-wrapper .yes {
     background: yellowgreen;
@@ -54,6 +55,13 @@
   .question-wrapper .no {
     background-color: orangered;
     background: linear-gradient(to bottom right, orangered, orange);
+    top: 0; }
+  .question-wrapper .skip {
+    height: 100%;
+    width: 0;
+    background-color: lightgray;
+    background: linear-gradient(to bottom right, lightgray, gray);
+    left: 100%;
     top: 0; }
 
 @media screen and (max-width: 600px) {
@@ -90,6 +98,9 @@
 
 .key.down:before {
   content: '\2193'; }
+
+.key.right:before {
+  content: '\2192'; }
 
 .help {
   position: absolute;
