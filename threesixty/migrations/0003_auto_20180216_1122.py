@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='survey',
             name='participant_can_skip',
-            field=models.BooleanField(default=True, help_text='This option allows a participant of this survey to skip single questions.', verbose_name='participant can skip'),
+            field=models.BooleanField(default=False, help_text='This option allows a participant of this survey to skip single questions.', verbose_name='participant can skip'),
         ),
         migrations.AlterField(
             model_name='answer',
