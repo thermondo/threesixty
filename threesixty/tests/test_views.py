@@ -1,0 +1,278 @@
+import random
+import json
+from django.core import mail
+from django.urls import reverse
+
+from threesixty.views import AnswerCreateView
+from threesixty.forms import AnswerForm
+from threesixty.models import Survey, Participant, Question, Answer
+
+
+class TestViews:
+    def create_survey(self):
+        survey = Survey(
+            employee_name='sebastian',
+            employee_gender='male',
+            employee_email='sebastian@mail.com',
+            manager_email='johannes@mail.com',
+        )
+        survey.save()
+        return survey
+
+    def create_participant(self, survey_pk):
+        participant = Participant(
+            email='sebastian@mail.com',
+            survey_id=survey_pk,
+            relation='self',
+        )
+        participant.save()
+        return participant
+
+    def create_question(self):
+        question = Question(
+            text='how good is he?',
+            attribute='porfessionalitaet',
+            connotation=True,
+        )
+        question.save()
+        return question
+
+
+class TestSurveyDetailView(TestViews):
+    def test_get_survey(self, client, db):
+        survey = self.create_survey()
+        response = client.get(survey.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['object'].employee_name == 'sebastian'
+        assert response.context['object'].participant_can_skip is False
+
+    def test_get_survey_can_skip(self, db, client):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+
+        response = client.get(survey.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['object'].employee_name == 'sebastian'
+        assert response.context['object'].participant_can_skip is True
+
+
+class TestSurveyUpdateView(TestViews):
+    def test_get_update_view(self, client, db):
+        survey = self.create_survey()
+        survey.is_complete = True
+        survey.save()
+
+        response = client.get(survey.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['widget']['attrs']['checked']
+
+    def test_set_is_complete_true(self, client, db):
+        survey = self.create_survey()
+        survey.is_complete = False
+        survey.save()
+
+        response = client.post(survey.get_absolute_url(), {'is_complete': 'True'})
+
+        assert Survey.objects.get().is_complete
+
+    def test_set_is_complete_false(self, client, db):
+        survey = self.create_survey()
+        survey.is_complete = True
+        survey.save()
+
+        response = client.post(survey.get_absolute_url(), {'is_complete': 'False'})
+
+        assert not Survey.objects.get().is_complete
+
+
+class TestSurveyDataView(TestViews):
+    def create_questions(self):
+        questions = []
+        for i in range(1, 4):
+            question = Question(
+                text='Question %s' % i,
+                attribute='attribute %s' % i,
+                connotation=True,
+            )
+            question.save()
+            questions.append(question)
+        for i in range(4, 7):
+            question = Question(
+                text='Question %s' % i,
+                attribute='attribute %d' % (i-3),
+                connotation=False,
+            )
+            question.save()
+            questions.append(question)
+        return questions
+
+    def create_answer(self, name, relation, questions, survey, modulo):
+        participant = Participant(
+            email='%s@mail.com' % name,
+            survey_id=survey.pk,
+            relation=relation,
+        )
+        participant.save()
+        for i in range(6):
+            answer = Answer(
+                survey=survey,
+                question=questions[i],
+                decision=i % modulo == 0,
+                participant=participant,
+            )
+            answer.save()
+
+    def create_survey_answer_test_data(self):
+        questions = self.create_questions()
+        survey = self.create_survey()
+        survey.is_complete = True
+        survey.save()
+
+        self.create_answer(
+            name='peter',
+            relation='peer',
+            questions=questions,
+            survey=survey,
+            modulo=4,
+        )
+        self.create_answer(
+            name='george',
+            relation='subordinate',
+            questions=questions,
+            survey=survey,
+            modulo=2,
+        )
+        self.create_answer(
+            name='sebastian',
+            relation='self',
+            questions=questions,
+            survey=survey,
+            modulo=3,
+        )
+
+        return survey
+
+    def test_data_view_values(self, db, client):
+        survey = self.create_survey_answer_test_data()
+
+        url = reverse(
+            'survey-data',
+            kwargs={'pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+        )
+
+        response = client.get(url)
+        data = json.loads(response.content)['datasets']
+        result_peer = data[0]
+        result_subordinate = data[1]
+        result_self = data[2]
+        result_total = data[3]
+        result_benchmark = data[4]
+
+        assert result_peer['label'] == 'peer'
+        assert result_peer['data'] == [0.0, 1.0, 0.5]
+
+        assert result_subordinate['label'] == 'subordinate'
+        assert result_subordinate['data'] == [0.0, 1.0, 1.0]
+
+        assert result_self['label'] == 'self'
+        assert result_self['data'] == [0.5, 0.5, 0.5]
+
+        assert result_total['label'] == 'total'
+        assert result_total['data'] == [0.0, 1.0, 0.75]
+
+        assert result_benchmark['label'] == 'benchmark'
+        assert result_benchmark['data'] == [0.0, 1.0, 0.75]
+
+
+class TestParticipantCreateView(TestViews):
+    def test_get_form(self, client, db):
+        survey = self.create_survey()
+
+        url = reverse(
+            'survey-invite',
+            kwargs={'survey_pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+        )
+        response = client.get(url)
+
+        assert response.status_code == 200
+
+    def test_send_invite(self, client, db):
+        survey = self.create_survey()
+
+        url = reverse(
+            'survey-invite',
+            kwargs={'survey_pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+        )
+        response = client.post(url, {'email': 'peter@mail.com', 'relation': 'peer'})
+
+        assert response.status_code == 302
+        assert mail.outbox[0].recipients()[0] == 'peter@mail.com'
+        assert Participant.objects.get().email == 'peter@mail.com'
+
+
+class TestSurveyCreateView(TestViews):
+    def test_create_survey(self, client, db):
+        response = client.post(
+            '/create',
+            {
+                'employee_name': 'sebastian',
+                'employee_email': 'sebastian@mail.com',
+                'employee_gender': 'male',
+                'manager_email': 'joe@mail.com',
+                'participant_can_skip': 'False',
+            }
+        )
+
+        assert response.status_code == 302
+        assert 'joe@mail.com' in response.url
+
+        assert mail.outbox[0].recipients()[0] == 'joe@mail.com'
+        assert mail.outbox[1].recipients()[0] == 'sebastian@mail.com'
+
+        assert len(Survey.objects.all()) == 1
+
+
+class TestAnswerCreateView(TestViews):
+    def test_get_when_no_question(self, client, db):
+        survey = self.create_survey()
+        participant = self.create_participant(survey.pk)
+        response = client.get(participant.get_absolute_url())
+
+        assert response.status_code == 302
+        assert response.url == '/thanks'
+
+    def test_get_one_question_left(self, client, db):
+        survey = self.create_survey()
+        participant = self.create_participant(survey.pk)
+        question = self.create_question()
+        response = client.get(participant.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['name'] == survey.employee_name
+        assert response.context['statement'] == question.text
+
+    def test_form_valid_skip_not_allowed_skip(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = False
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        question = self.create_question()
+
+        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
+
+        assert response.status_code == 403
+
+    def test_form_valid_skip_allowed(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        question = self.create_question()
+
+        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
+
+        assert response.status_code == 302  # since no more questions are left
