@@ -16,7 +16,6 @@ class TestViews:
             employee_email='sebastian@mail.com',
             manager_email='johannes@mail.com',
         )
-        survey.save()
         return survey
 
     def create_participant(self, survey_pk):
@@ -25,7 +24,6 @@ class TestViews:
             survey_id=survey_pk,
             relation='self',
         )
-        participant.save()
         return participant
 
     def create_question(self):
@@ -34,13 +32,13 @@ class TestViews:
             attribute='porfessionalitaet',
             connotation=True,
         )
-        question.save()
         return question
 
 
 class TestSurveyDetailView(TestViews):
     def test_get_survey(self, client, db):
         survey = self.create_survey()
+        survey.save()
         response = client.get(survey.get_absolute_url())
 
         assert response.status_code == 200
@@ -191,6 +189,7 @@ class TestSurveyDataView(TestViews):
 class TestParticipantCreateView(TestViews):
     def test_get_form(self, client, db):
         survey = self.create_survey()
+        survey.save()
 
         url = reverse(
             'survey-invite',
@@ -202,6 +201,7 @@ class TestParticipantCreateView(TestViews):
 
     def test_send_invite(self, client, db):
         survey = self.create_survey()
+        survey.save()
 
         url = reverse(
             'survey-invite',
@@ -239,7 +239,9 @@ class TestSurveyCreateView(TestViews):
 class TestAnswerCreateView(TestViews):
     def test_get_when_no_question(self, client, db):
         survey = self.create_survey()
+        survey.save()
         participant = self.create_participant(survey.pk)
+        participant.save()
         response = client.get(participant.get_absolute_url())
 
         assert response.status_code == 302
@@ -247,8 +249,12 @@ class TestAnswerCreateView(TestViews):
 
     def test_get_one_question_left(self, client, db):
         survey = self.create_survey()
+        survey.save()
         participant = self.create_participant(survey.pk)
+        participant.save()
         question = self.create_question()
+        question.save()
+
         response = client.get(participant.get_absolute_url())
 
         assert response.status_code == 200
@@ -260,7 +266,9 @@ class TestAnswerCreateView(TestViews):
         survey.participant_can_skip = False
         survey.save()
         participant = self.create_participant(survey.pk)
+        participant.save()
         question = self.create_question()
+        question.save()
 
         response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
 
@@ -271,7 +279,9 @@ class TestAnswerCreateView(TestViews):
         survey.participant_can_skip = True
         survey.save()
         participant = self.create_participant(survey.pk)
+        participant.save()
         question = self.create_question()
+        question.save()
 
         response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
 
