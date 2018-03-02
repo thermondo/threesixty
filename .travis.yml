@@ -1,0 +1,23 @@
+language: python
+sudo: false
+branches:
+  only:
+  - master
+
+cache:
+  pip: true
+
+python:
+- '3.6.4'
+addons:
+  postgresql: '9.4'
+
+install:
+- pip install --upgrade pip
+- pip install -qr requirements.txt
+before_script:
+- psql -c 'create database threesixty;' -U postgres
+script:
+- python manage.py makemigrations --check
+- isort --check-only --recursive --diff .
+- py.test
