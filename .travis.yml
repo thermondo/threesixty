@@ -1,23 +1,20 @@
 language: python
 sudo: false
-branches:
-  only:
-  - master
-
 cache:
-  pip: true
-
+- pip
 python:
 - '3.6.4'
-addons:
-  postgresql: '9.4'
-
+services:
+- postgresql
+env:
+  global:
+  - DATABASE_URL=postgres://localhost/travis
+  - SECRET_KEY='super-secret-key'
 install:
-- pip install --upgrade pip
-- pip install -qr requirements.txt
-before_script:
-- psql -c 'create database threesixty;' -U postgres
+- pip install --upgrade pipenv
+- pipenv install --dev
 script:
-- python manage.py makemigrations --check
-- isort --check-only --recursive --diff .
-- py.test
+- pipenv run python manage.py collectstatic --no-input
+- pipenv run coverage run --source threesixty -m pytest
+on_success:
+- codecov

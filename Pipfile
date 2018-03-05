@@ -1,0 +1,29 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+dj-database-url = "*"
+django = "*"
+"psycopg2" = "*"
+waitress = "*"
+whitenoise = "*"
+
+
+[dev-packages]
+
+isort = "*"
+pytest = "*"
+pytest-django = "*"
+pycodestyle = "*"
+coverage = "*"
+codecov = "*"
+
+
+[requires]
+
+python_version = "3.6"

@@ -1,5 +1,0 @@
--r requirements.txt
-isort
-pytest
-pytest-django
-pycodestyle
