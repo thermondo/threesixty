@@ -10,6 +10,7 @@ env:
   global:
   - DATABASE_URL=postgres://localhost/travis
   - SECRET_KEY='super-secret-key'
+  - DEBUG=True
 install:
 - pip install --upgrade pipenv
 - pipenv install --dev
