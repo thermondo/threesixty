@@ -163,27 +163,57 @@ class TestSurveyDataView(TestViews):
         )
 
         response = client.get(url)
+
         data = json.loads(response.content)['datasets']
-        result_peer = data[0]
-        result_subordinate = data[1]
-        result_self = data[2]
-        result_total = data[3]
-        result_benchmark = data[4]
+        labels = json.loads(response.content)['labels']
+
+        results_by_label = {result['label']: result for result in data}
+
+        result_peer = results_by_label['peer']
+        result_subordinate = results_by_label['subordinate']
+        result_self = results_by_label['self']
+        result_total = results_by_label['total']
+        result_benchmark = results_by_label['benchmark']
 
         assert result_peer['label'] == 'peer'
-        assert result_peer['data'] == [0.0, 1.0, 0.5]
+        result_peer_data = self.group_data_labels(labels, result_peer['data'])
+        assert result_peer_data['attribute 1'] == 1.0
+        assert result_peer_data['attribute 2'] == 0
+        assert result_peer_data['attribute 3'] == 0.5
 
         assert result_subordinate['label'] == 'subordinate'
-        assert result_subordinate['data'] == [0.0, 1.0, 1.0]
+        result_subordinate_data = self.group_data_labels(labels, result_subordinate['data'])
+        assert result_subordinate_data['attribute 1'] == 1.0
+        assert result_subordinate_data['attribute 2'] == 0.0
+        assert result_subordinate_data['attribute 3'] == 1.0
 
         assert result_self['label'] == 'self'
-        assert result_self['data'] == [0.5, 0.5, 0.5]
+        result_self_data = self.group_data_labels(labels, result_self['data'])
+        assert result_self_data['attribute 1'] == 0.5
+        assert result_self_data['attribute 2'] == 0.5
+        assert result_self_data['attribute 3'] == 0.5
 
         assert result_total['label'] == 'total'
-        assert result_total['data'] == [0.0, 1.0, 0.75]
+        result_total_data = self.group_data_labels(labels, result_total['data'])
+        assert result_total_data['attribute 1'] == 1.0
+        assert result_total_data['attribute 2'] == 0.0
+        assert result_total_data['attribute 3'] == 0.75
 
         assert result_benchmark['label'] == 'benchmark'
-        assert result_benchmark['data'] == [0.0, 1.0, 0.75]
+        result_benchmark_data = self.group_data_labels(labels, result_benchmark['data'])
+        assert result_benchmark_data['attribute 1'] == 1.0
+        assert result_benchmark_data['attribute 2'] == 0.0
+        assert result_benchmark_data['attribute 3'] == 0.75
+
+    def group_data_labels(self, labels, data_points):
+        """Group labels with data.
+
+        labels = ['a1','a2','a3']
+        data_points = [0,1,2]
+
+        result: {'a1': 0, 'a2': 1, 'a3': }
+        """
+        return dict(zip(labels, data_points))
 
 
 class TestParticipantCreateView(TestViews):
