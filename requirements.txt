@@ -1,4 +1,4 @@
-dj-database-url
+dj-database-url==0.5.0
 django
 psycopg2
 waitress
