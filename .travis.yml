@@ -1,0 +1,21 @@
+language: python
+sudo: false
+cache:
+- pip
+python:
+- '3.6.4'
+services:
+- postgresql
+env:
+  global:
+  - DATABASE_URL=postgres://localhost/travis
+  - SECRET_KEY='super-secret-key'
+  - DEBUG=True
+install:
+- pip install --upgrade pipenv
+- pipenv install --dev
+script:
+- pipenv run python manage.py collectstatic --no-input
+- pipenv run coverage run --source threesixty -m pytest
+on_success:
+- codecov

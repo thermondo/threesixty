@@ -1,5 +1,0 @@
-dj-database-url
-django
-psycopg2
-waitress
-whitenoise
