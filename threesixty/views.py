@@ -272,7 +272,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         qs = models.Question.objects.exclude(pk__in=answered)
         count = qs.count()
         try:
-            return qs[random.randint(0, count - 1)]
+            return qs[random.randint(0, count - 1)]  # nosec
         except ValueError:
             raise models.Question.DoesNotExist('No question found.')
 
