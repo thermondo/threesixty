@@ -277,10 +277,16 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
             raise models.Question.DoesNotExist('No question found.')
 
     def get_context_data(self, **kwargs):
+        qs = Question.objects
+        total_questions = qs.count()
+        answered_questions = answered = self.participant.answer_set.all().values_list('question_id', flat=True).count()
+
         context = super().get_context_data(**kwargs)
         context['name'] = self.survey.employee_name
         context['statement'] = self.question.get_display(self.survey)
         context['can_skip'] = self.survey.participant_can_skip
+        context['answered_questions'] = answered_questions
+        context['total_questions'] = total_questions
         return context
 
     def get_initial(self):
