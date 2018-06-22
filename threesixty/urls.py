@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:pk>/<token>/data', views.SurveyDataView.as_view(), name='survey-data'),
     path('<int:survey_pk>/<token>/invite', views.ParticipantCreateView.as_view(), name='survey-invite'),
     path('<int:survey_pk>/<token>/answer', views.AnswerCreateView.as_view(), name='survey-answer'),
+    path('<int:survey_pk>/<token>/answer/<int:question_pk>', views.AnswerCreateView.as_view(), name='surver-answer-specific')
 ]

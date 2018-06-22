@@ -1,6 +1,8 @@
 import random
 from collections import defaultdict
 from decimal import Decimal
+from django.http import Http404, HttpResponseForbidden, HttpResponseNotFound, \
+    HttpResponseRedirect, JsonResponse
 
 from django.core import signing
 from django.core.mail import send_mail
@@ -12,6 +14,7 @@ from django.urls import reverse
 from django.views import generic
 
 from . import forms, models
+from .models import Answer
 
 
 class WithEmailTokenMixin:
@@ -260,12 +263,23 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
 
     def get(self, request, *args, **kwargs):
         self.participant = get_object_or_404(models.Participant, email=self.email, survey=self.survey)
-        try:
-            self.question = self.get_question()
-        except models.Question.DoesNotExist:
-            return HttpResponseRedirect(reverse('thanks'))
+        if self.kwargs.get('question_pk'):
+            question_pk = self.kwargs['question_pk']
+            if Answer.objects.filter(participant=self.participant, survey=self.survey, question__pk=question_pk).exists():
+                return HttpResponseRedirect(reverse('survey-answer', kwargs={'survey_pk': self.survey.pk, 'token': self.token}))
+            else:
+                if question_pk in models.Question.objects.values_list('id', flat=True):
+                    self.question = models.Question.objects.get(pk=question_pk)
+                    return super().get(request, *args, **kwargs)
+                else:
+                    return HttpResponseNotFound('Question not Found')
         else:
-            return super().get(request, *args, **kwargs)
+            try:
+                self.question = self.get_question()
+            except models.Question.DoesNotExist:
+                return HttpResponseRedirect(reverse('thanks'))
+            else:
+                return super().get(request, *args, **kwargs)
 
     def get_question(self):
         answered = self.participant.answer_set.all().values_list('question_id', flat=True)
