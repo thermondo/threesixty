@@ -9,16 +9,23 @@ class Question {
     this.swipeStatus = this.swipeStatus.bind(this)
     this.$yes = $('.yes')
     this.select = $('#id_decision')
+    this.undo = $('#id_undo')
+    this.undo.attr('value', 'false')
     this.select.find('option[value="1"]').removeAttr('selected')
     this.form = $('form')[0]
     this.$no = $('.no')
     this.$skip = $('.skip')
+    this.$undo = $('.undo')
     this.$body = $('.question-wrapper')
     this.$body.swipe(this)
     this.userCanSkip = userCanSkip
     $(document).on('keydown', e => {
       if (!$('#search:focus').length) {
         if (!this.answered) {
+          if (e.keyCode === 37) {
+            this.submitUndo()
+            return false
+          }
           if (e.keyCode === 38) {  // up
             this.submitYes()
             return false
@@ -43,6 +50,7 @@ class Question {
     this.select.find('option[value="3"]').attr('selected', 'selected').parent().trigger('change') // 1 = Yes
     this.$yes.height(0)
     this.$skip.width(0)
+    this.$undo.width(0)
     this.$no.animate({height: '100%'}, {duration: 250, start: this.$no.height(), complete: () => this.form.submit()})
   }
 
@@ -51,6 +59,7 @@ class Question {
     this.select.find('option[value="2"]').attr('selected', 'selected').parent().trigger('change') // 2 = No
     this.$no.height(0)
     this.$skip.width(0)
+    this.$undo.width(0)
     this.$yes.animate({height: '100%'}, {duration: 250, start: this.$yes.height(), complete: () => this.form.submit()})
   }
 
@@ -59,13 +68,24 @@ class Question {
     this.select.find('option[value="1"]').attr('selected', 'selected').parent().trigger('change') // 1 = Unknown == skip
     this.$no.height(0)
     this.$yes.height(0)
+    this.$undo.width(0)
     this.$skip.animate({left: '0%', width: '100%'}, {duration: 250, start: this.$skip.width(), complete: () => this.form.submit()})
+  }
+
+  submitUndo () {
+    this.answered = true
+    this.undo.attr('value', 'true')
+    this.$no.height(0)
+    this.$yes.height(0)
+    this.$skip.width(0)
+    this.$undo.animate({width: '100%'}, {duration: 250, start: this.$undo.width(), complete: () => this.form.submit()})
   }
 
   reset () {
     this.$yes.animate({height: '0'}, 100)
     this.$no.animate({height: '0'}, 100)
-    this.$skip.animate({height: '0'}, 100)
+    this.$skip.animate({width: '0'}, 100)
+    this.$undo.animate({width: '0'}, 100)
   }
 
   swipeStatus (event, phase, direction, distance) {
@@ -77,11 +97,14 @@ class Question {
       } else if (direction === 'left') {
         this.$skip.css('left', $(window).width() - distance * 1.5)
         this.$skip.css('width', distance * 1.5)
+      } else if (direction === 'right') {
+        this.$undo.css('width', distance * 1.5)
       }
     } else if (phase === 'cancel') {
       this.$yes.height(0)
       this.$no.height(0)
       this.$skip.width(0)
+      this.$undo.width(0)
     } else if (phase === 'end') {
       if ((direction === 'down') && (distance > (window.innerHeight / 3))) {
         this.submitNo()
@@ -89,6 +112,8 @@ class Question {
         this.submitYes()
       } else if ((direction === 'left') && (distance > (window.innerWidth / 3)) && this.userCanSkip) {
         this.submitSkip()
+      } else if ((direction === 'right') && (distance > (window.innerWidth / 3))) {
+        this.submitUndo()
       } else {
         this.reset()
       }

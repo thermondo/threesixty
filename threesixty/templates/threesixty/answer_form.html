@@ -11,11 +11,12 @@
     </div>
     <form method="POST" style="display: none">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form }}
     </form>
 
     <div class="swipe-container">
         <div class="question-wrapper">
+            <h3 class="undo">{% trans 'undo' %}</h3>
             <h3 class="no">{% trans 'no' %}</h3>
             <div class="question">
                 <h1>{{ statement }}</h1>
