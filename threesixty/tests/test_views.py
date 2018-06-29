@@ -320,7 +320,7 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
+        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk, 'undo': 'false'})
 
         assert response.status_code == 403
 
@@ -333,7 +333,7 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
+        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk, 'undo': 'false'})
 
         assert response.status_code == 302  # since no more questions are left
 
