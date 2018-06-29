@@ -277,7 +277,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
             raise models.Question.DoesNotExist('No question found.')
 
     def get_context_data(self, **kwargs):
-        qs = Question.objects
+        qs = models.Question.objects
         total_questions = qs.count()
         answered_questions = answered = self.participant.answer_set.all().values_list('question_id', flat=True).count()
 
