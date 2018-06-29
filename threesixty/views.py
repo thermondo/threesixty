@@ -279,7 +279,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
     def get_context_data(self, **kwargs):
         qs = models.Question.objects
         total_questions = qs.count()
-        answered_questions = self.participant.answer_set.all().count()
+        answered_questions = self.participant.answer_set.count()
 
         context = super().get_context_data(**kwargs)
         context['name'] = self.survey.employee_name
