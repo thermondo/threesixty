@@ -319,20 +319,20 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
 
     def form_valid(self, form):
         if self.survey.participant_can_skip is False and form.cleaned_data['decision'] is None:
-            if form.data['undo'] == 'true':
-                try:
-                    latest_answer = Answer.objects.filter(participant=self.participant).latest('created')
-                    kwargs = {
-                        'survey_pk': self.survey.pk,
-                        'token': self.token,
-                        'question_pk': latest_answer.question.pk
-                    }
-                    latest_answer.delete()
-                    return HttpResponseRedirect(reverse('surver-answer-specific', kwargs=kwargs))
-                except Answer.DoesNotExist:
-                    return self.redirect_survey_answer(self.survey.pk, self.token)
-            else:
-                return HttpResponseForbidden()
+            return HttpResponseForbidden()
+        
+        if form.data['undo'] == 'true':
+            try:
+                latest_answer = Answer.objects.filter(participant=self.participant).latest('created')
+                kwargs = {
+                    'survey_pk': self.survey.pk,
+                    'token': self.token,
+                    'question_pk': latest_answer.question.pk
+                }
+                latest_answer.delete()
+                return HttpResponseRedirect(reverse('surver-answer-specific', kwargs=kwargs))
+            except Answer.DoesNotExist:
+                return self.redirect_survey_answer(self.survey.pk, self.token)
         else:
             self.object = form.save(commit=False)
             self.object.participant = self.participant

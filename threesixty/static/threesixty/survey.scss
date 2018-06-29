@@ -112,6 +112,10 @@
   color: orangered;
 }
 
+.key.left{
+  color: lightseagreen;
+}
+
 .key:before {
   color: #999;
   margin-right: 10px;
@@ -126,6 +130,10 @@
   border-radius: 3px;
   box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(0, 0, 0, 0.2);
   background-color: white;
+}
+
+.key.left:before {
+  content: '\2190';
 }
 
 .key.up:before {
