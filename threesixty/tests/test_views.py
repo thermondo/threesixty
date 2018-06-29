@@ -1,8 +1,12 @@
 import json
-from django.core import mail
+import random
+
+from django.core import mail, signing
 from django.urls import reverse
 
-from threesixty.models import Survey, Participant, Question, Answer
+from threesixty.forms import AnswerForm
+from threesixty.models import Answer, Participant, Question, Survey
+from threesixty.views import AnswerCreateView
 
 
 class TestViews:
@@ -362,3 +366,97 @@ class TestAnswerCreateView(TestViews):
         assert response.context['statement'] == question2.text
         assert response.context['answered_questions'] == 1
         assert response.context['total_questions'] == 2
+
+    def test_get_specific_question(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question = self.create_question()
+        question.save()
+
+        question1 = Question(
+            text='h0w good is hes?',
+            attribute='porfessionalitaet',
+            connotation=True,
+        )
+        question1.save()
+
+        signer = signing.TimestampSigner()
+        token = signer.sign(participant.email)
+
+        kwargs = {
+                    'survey_pk': survey.pk,
+                    'token': token,
+                    'question_pk': question.pk
+                }
+
+        response = client.get(reverse('surver-answer-specific', kwargs=kwargs))
+        
+        assert response.context[0]['statement'] == question.text
+
+    def test_undo(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question = self.create_question()
+        question.save()
+
+        question1 = Question(
+            text='h0w good is hes?',
+            attribute='porfessionalitaet',
+            connotation=True,
+        )
+        question1.save()
+
+        answer = Answer(
+            survey=survey,
+            question=question,
+            participant=participant
+        )
+        answer.save()
+
+        answer1 = Answer(
+            survey=survey,
+            question=question1,
+            participant=participant
+        )
+        answer1.save()
+
+        response = client.post(participant.get_absolute_url(), {'decision': None, 'question': question.pk, 'undo': 'true'})
+        assert response.status_code == 302
+        assert Answer.objects.count() == 1
+        assert Answer.objects.last().question == question
+
+    def test_submit_answer_yes(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question = self.create_question()
+        question.save()
+
+        response = client.post(participant.get_absolute_url(), {'decision': 2, 'question': question.pk, 'undo': 'false'})
+
+        assert response.status_code == 302
+        assert Answer.objects.count() == 1
+        assert Answer.objects.last().decision == True
+
+    def test_submit_answer_no(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = True
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question = self.create_question()
+        question.save()
+
+        response = client.post(participant.get_absolute_url(), {'decision': 3, 'question': question.pk, 'undo': 'false'})
+
+        assert response.status_code == 302
+        assert Answer.objects.count() == 1
+        assert Answer.objects.last().decision == False
