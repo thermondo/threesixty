@@ -1,10 +1,7 @@
-import random
 import json
 from django.core import mail
 from django.urls import reverse
 
-from threesixty.views import AnswerCreateView
-from threesixty.forms import AnswerForm
 from threesixty.models import Survey, Participant, Question, Answer
 
 
@@ -73,7 +70,7 @@ class TestSurveyUpdateView(TestViews):
         survey.is_complete = False
         survey.save()
 
-        response = client.post(survey.get_absolute_url(), {'is_complete': 'True'})
+        client.post(survey.get_absolute_url(), {'is_complete': 'True'})
 
         assert Survey.objects.get().is_complete
 
@@ -82,7 +79,7 @@ class TestSurveyUpdateView(TestViews):
         survey.is_complete = True
         survey.save()
 
-        response = client.post(survey.get_absolute_url(), {'is_complete': 'False'})
+        client.post(survey.get_absolute_url(), {'is_complete': 'False'})
 
         assert not Survey.objects.get().is_complete
 

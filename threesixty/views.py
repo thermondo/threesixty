@@ -6,7 +6,6 @@ from django.core import signing
 from django.core.mail import send_mail
 from django.db import connection
 from django.http import Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
-from django.db.models import Avg, FloatField, IntegerField
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
