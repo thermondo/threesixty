@@ -1,0 +1,4 @@
+- bandit
+- pycodestyle
+- pydocstyle
+- pyflakes
