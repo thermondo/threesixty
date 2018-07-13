@@ -34,11 +34,12 @@ class TestViews:
         )
         return question
 
-    def create_answer(self, question, survey, participant):
+    def create_answer(self, question, survey, participant, **kwargs):
         answer = Answer(
             survey=survey,
             question=question,
-            participant=participant
+            participant=participant,
+            **kwargs,
         )
         return answer
 
