@@ -23,6 +23,11 @@ class Survey(models.Model):
         default=False,
         help_text=_('This option allows a participant of this survey to skip single questions.')
     )
+    show_question_progress = models.BooleanField(
+        'show question progress',
+        default=False,
+        help_text=_('This option displays how many questions are completed out of the total amount questions.')
+    )
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
 
     def __str__(self):

@@ -212,7 +212,8 @@ class SurveyCreateView(generic.CreateView):
         'employee_email',
         'employee_gender',
         'manager_email',
-        'participant_can_skip'
+        'participant_can_skip',
+        'show_question_progress',
     ]
 
     def form_valid(self, form):
@@ -285,6 +286,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         context['name'] = self.survey.employee_name
         context['statement'] = self.question.get_display(self.survey)
         context['can_skip'] = self.survey.participant_can_skip
+        context['show_question_progress'] = self.survey.show_question_progress
         context['answered_questions'] = answered_questions
         context['total_questions'] = total_questions
         return context
