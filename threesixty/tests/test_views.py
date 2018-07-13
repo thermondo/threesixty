@@ -65,6 +65,17 @@ class TestSurveyDetailView(TestViews):
         assert response.context['object'].employee_name == 'sebastian'
         assert response.context['object'].participant_can_skip is True
 
+    def test_get_survey_show_question_progress(self, db, client):
+        survey = self.create_survey()
+        survey.show_question_progress = True
+        survey.save()
+
+        response = client.get(survey.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['object'].employee_name == 'sebastian'
+        assert response.context['object'].show_question_progress is True
+
 
 class TestSurveyUpdateView(TestViews):
     def test_get_update_view(self, client, db):
@@ -263,6 +274,7 @@ class TestSurveyCreateView(TestViews):
                 'employee_gender': 'male',
                 'manager_email': 'joe@mail.com',
                 'participant_can_skip': 'False',
+                'show_question_progress': 'False',
             }
         )
 
