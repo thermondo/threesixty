@@ -5,6 +5,9 @@
     <body>
     <div class="w3-bar w3-amber w3-text-white">
         <h2 class="w3-center">{{ name }}</h2>
+        {% if show_question_progress %}
+        <h5 class="w3-center">You have answered {{ answered_questions }} out of {{ total_questions }} questions</h5>
+        {% endif %}
     </div>
     <form method="POST" style="display: none">
         {% csrf_token %}

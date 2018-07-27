@@ -34,6 +34,15 @@ class TestViews:
         )
         return question
 
+    def create_answer(self, question, survey, participant, **kwargs):
+        answer = Answer(
+            survey=survey,
+            question=question,
+            participant=participant,
+            **kwargs,
+        )
+        return answer
+
 
 class TestSurveyDetailView(TestViews):
     def test_get_survey(self, client, db):
@@ -55,6 +64,17 @@ class TestSurveyDetailView(TestViews):
         assert response.status_code == 200
         assert response.context['object'].employee_name == 'sebastian'
         assert response.context['object'].participant_can_skip is True
+
+    def test_get_survey_show_question_progress(self, db, client):
+        survey = self.create_survey()
+        survey.show_question_progress = True
+        survey.save()
+
+        response = client.get(survey.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['object'].employee_name == 'sebastian'
+        assert response.context['object'].show_question_progress is True
 
 
 class TestSurveyUpdateView(TestViews):
@@ -254,6 +274,7 @@ class TestSurveyCreateView(TestViews):
                 'employee_gender': 'male',
                 'manager_email': 'joe@mail.com',
                 'participant_can_skip': 'False',
+                'show_question_progress': 'False',
             }
         )
 
@@ -290,6 +311,8 @@ class TestAnswerCreateView(TestViews):
         assert response.status_code == 200
         assert response.context['name'] == survey.employee_name
         assert response.context['statement'] == question.text
+        assert response.context['answered_questions'] == 0
+        assert response.context['total_questions'] == 1
 
     def test_form_valid_skip_not_allowed_skip(self, client, db):
         survey = self.create_survey()
@@ -316,3 +339,29 @@ class TestAnswerCreateView(TestViews):
         response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk})
 
         assert response.status_code == 302  # since no more questions are left
+
+    def test_question_answered(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = False
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question1 = self.create_question()
+        question1.save()
+        question2 = Question(
+            text='how goodst is he?',
+            attribute='porfessionalitaet',
+            connotation=True,
+        )
+        question2.save()
+
+        answer = self.create_answer(question1, survey, participant)
+        answer.save()
+
+        response = client.get(participant.get_absolute_url())
+
+        assert response.status_code == 200
+        assert response.context['name'] == survey.employee_name
+        assert response.context['statement'] == question2.text
+        assert response.context['answered_questions'] == 1
+        assert response.context['total_questions'] == 2
