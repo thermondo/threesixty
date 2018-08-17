@@ -1,20 +1,18 @@
 import random
 from collections import defaultdict
 from decimal import Decimal
-from django.http import Http404, HttpResponseForbidden, HttpResponseNotFound, \
-    HttpResponseRedirect, JsonResponse
 
 from django.core import signing
 from django.core.mail import send_mail
 from django.db import connection
-from django.http import Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
+from django.http import (Http404, HttpResponseForbidden,
+                         HttpResponseRedirect, JsonResponse)
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views import generic
 
 from . import forms, models
-from .models import Answer, Question
 
 
 class WithEmailTokenMixin:
@@ -263,36 +261,36 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
 
     def get(self, request, *args, **kwargs):
         self.participant = get_object_or_404(models.Participant, email=self.email, survey=self.survey)
-        if self.kwargs.get('question_pk'):
-            return self.get_specific_question(request, args, kwargs)
+        question_pk = self.kwargs.get('question_pk', None)
+        if question_pk:
+            return self.get_specific_question(request, question_pk, args, kwargs)
         else:
             return self.get_random_question(request, args, kwargs)
 
-    def get_specific_question(self, request, args, kwargs):
-        question_pk = self.kwargs['question_pk']
+    def get_specific_question(self, request, question_pk, args, kwargs):
         if self.participant.answer_set.filter(question__pk=question_pk).exists():
             return self.redirect_survey_answer(self.survey.pk, self.token)
         else:
-            question = get_object_or_404(Question, pk=question_pk)
+            question = get_object_or_404(models.Question, pk=question_pk)
             self.question = question
             return super().get(request, args, kwargs)
 
     def get_random_question(self, request, args, kwargs):
         try:
             self.question = self.get_question()
-        except Question.DoesNotExist:
+        except models.Question.DoesNotExist:
             return HttpResponseRedirect(reverse('thanks'))
         else:
             return super().get(request, args, kwargs)
 
     def get_question(self):
         answered = self.participant.answer_set.all().values_list('question_id', flat=True)
-        qs = Question.objects.exclude(pk__in=answered)
+        qs = models.Question.objects.exclude(pk__in=answered)
         count = qs.count()
         try:
             return qs[random.randint(0, count - 1)]  # nosec
         except ValueError:
-            raise Question.DoesNotExist('No question found.')
+            raise models.Question.DoesNotExist('No question found.')
 
     def get_context_data(self, **kwargs):
         qs = models.Question.objects
@@ -315,12 +313,12 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         return initial
 
     def form_valid(self, form):
-        if self.survey.participant_can_skip is False and form.cleaned_data['decision'] is None:
+        if not self.survey.participant_can_skip and form.cleaned_data['decision'] is None:
             return HttpResponseForbidden()
-        
+
         if form.data['undo'] == 'true':
             try:
-                latest_answer = Answer.objects.filter(participant=self.participant).latest('created')
+                latest_answer = models.Answer.objects.filter(participant=self.participant).latest('created')
                 kwargs = {
                     'survey_pk': self.survey.pk,
                     'token': self.token,
@@ -328,7 +326,7 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
                 }
                 latest_answer.delete()
                 return HttpResponseRedirect(reverse('surver-answer-specific', kwargs=kwargs))
-            except Answer.DoesNotExist:
+            except models.Answer.DoesNotExist:
                 return self.redirect_survey_answer(self.survey.pk, self.token)
         else:
             self.object = form.save(commit=False)

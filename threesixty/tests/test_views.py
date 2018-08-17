@@ -1,12 +1,9 @@
 import json
-import random
 
 from django.core import mail, signing
 from django.urls import reverse
 
-from threesixty.forms import AnswerForm
 from threesixty.models import Answer, Participant, Question, Survey
-from threesixty.views import AnswerCreateView
 
 
 class TestViews:
@@ -324,7 +321,10 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk, 'undo': 'false'})
+        response = client.post(
+            participant.get_absolute_url(),
+            {'decision': 1, 'question': question.pk, 'undo': 'false'}
+        )
 
         assert response.status_code == 403
 
@@ -337,7 +337,10 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 1, 'question': question.pk, 'undo': 'false'})
+        response = client.post(
+            participant.get_absolute_url(),
+            {'decision': 1, 'question': question.pk, 'undo': 'false'}
+        )
 
         assert response.status_code == 302  # since no more questions are left
 
@@ -387,13 +390,13 @@ class TestAnswerCreateView(TestViews):
         token = signer.sign(participant.email)
 
         kwargs = {
-                    'survey_pk': survey.pk,
-                    'token': token,
-                    'question_pk': question.pk
-                }
+            'survey_pk': survey.pk,
+            'token': token,
+            'question_pk': question.pk
+        }
 
         response = client.get(reverse('surver-answer-specific', kwargs=kwargs))
-        
+
         assert response.context[0]['statement'] == question.text
 
     def test_undo(self, client, db):
@@ -426,7 +429,11 @@ class TestAnswerCreateView(TestViews):
         )
         answer1.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': None, 'question': question.pk, 'undo': 'true'})
+        response = client.post(
+            participant.get_absolute_url(),
+            {'decision': None, 'question': question.pk, 'undo': 'true'}
+        )
+
         assert response.status_code == 302
         assert Answer.objects.count() == 1
         assert Answer.objects.last().question == question
@@ -440,11 +447,14 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 2, 'question': question.pk, 'undo': 'false'})
+        response = client.post(
+            participant.get_absolute_url(),
+            {'decision': 2, 'question': question.pk, 'undo': 'false'}
+        )
 
         assert response.status_code == 302
         assert Answer.objects.count() == 1
-        assert Answer.objects.last().decision == True
+        assert Answer.objects.last().decision
 
     def test_submit_answer_no(self, client, db):
         survey = self.create_survey()
@@ -455,8 +465,11 @@ class TestAnswerCreateView(TestViews):
         question = self.create_question()
         question.save()
 
-        response = client.post(participant.get_absolute_url(), {'decision': 3, 'question': question.pk, 'undo': 'false'})
+        response = client.post(
+            participant.get_absolute_url(),
+            {'decision': 3, 'question': question.pk, 'undo': 'false'}
+        )
 
         assert response.status_code == 302
         assert Answer.objects.count() == 1
-        assert Answer.objects.last().decision == False
+        assert not Answer.objects.last().decision

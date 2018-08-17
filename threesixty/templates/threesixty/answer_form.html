@@ -11,7 +11,7 @@
     </div>
     <form method="POST" style="display: none">
         {% csrf_token %}
-        {{ form }}
+        {{ form.as_p }}
     </form>
 
     <div class="swipe-container">
