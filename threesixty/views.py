@@ -273,12 +273,9 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         if self.participant.answer_set.filter(question__pk=question_pk).exists():
             return self.redirect_survey_answer(self.survey.pk, self.token)
         else:
-            question = Question.objects.get(pk=question_pk)
-            if question:
-                self.question = question
-                return super().get(request, args, kwargs)
-            else:
-                return HttpResponseNotFound('Question not Found')
+            question = get_object_or_404(Question, pk=question_pk)
+            self.question = question
+            return super().get(request, args, kwargs)
 
     def get_random_question(self, request, args, kwargs):
         try:
