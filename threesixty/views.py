@@ -5,7 +5,8 @@ from decimal import Decimal
 from django.core import signing
 from django.core.mail import send_mail
 from django.db import connection
-from django.http import Http404, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
+from django.http import (Http404, HttpResponseForbidden,
+                         HttpResponseRedirect, JsonResponse)
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -260,12 +261,27 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
 
     def get(self, request, *args, **kwargs):
         self.participant = get_object_or_404(models.Participant, email=self.email, survey=self.survey)
+        question_pk = self.kwargs.get('question_pk', None)
+        if question_pk:
+            return self.get_specific_question(request, question_pk, args, kwargs)
+        else:
+            return self.get_random_question(request, args, kwargs)
+
+    def get_specific_question(self, request, question_pk, args, kwargs):
+        if self.participant.answer_set.filter(question__pk=question_pk).exists():
+            return self.redirect_survey_answer(self.survey.pk, self.token)
+        else:
+            question = get_object_or_404(models.Question, pk=question_pk)
+            self.question = question
+            return super().get(request, args, kwargs)
+
+    def get_random_question(self, request, args, kwargs):
         try:
             self.question = self.get_question()
         except models.Question.DoesNotExist:
             return HttpResponseRedirect(reverse('thanks'))
         else:
-            return super().get(request, *args, **kwargs)
+            return super().get(request, args, kwargs)
 
     def get_question(self):
         answered = self.participant.answer_set.all().values_list('question_id', flat=True)
@@ -299,8 +315,29 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
     def form_valid(self, form):
         if not self.survey.participant_can_skip and form.cleaned_data['decision'] is None:
             return HttpResponseForbidden()
-        self.object = form.save(commit=False)
-        self.object.participant = self.participant
-        self.object.survey = self.survey
-        self.object.save()
-        return HttpResponseRedirect(self.request.path)
+
+        if form.data['undo'] == 'true':
+            try:
+                latest_answer = models.Answer.objects.filter(participant=self.participant).latest('created')
+                kwargs = {
+                    'survey_pk': self.survey.pk,
+                    'token': self.token,
+                    'question_pk': latest_answer.question.pk
+                }
+                latest_answer.delete()
+                return HttpResponseRedirect(reverse('surver-answer-specific', kwargs=kwargs))
+            except models.Answer.DoesNotExist:
+                return self.redirect_survey_answer(self.survey.pk, self.token)
+        else:
+            self.object = form.save(commit=False)
+            self.object.participant = self.participant
+            self.object.survey = self.survey
+            self.object.save()
+            return HttpResponseRedirect(self.request.path)
+
+    def redirect_survey_answer(self, survey_pk, token):
+        kwargs = {
+            'survey_pk': survey_pk,
+            'token': self.token,
+        }
+        return HttpResponseRedirect(reverse('survey-answer', kwargs=kwargs))

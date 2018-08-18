@@ -16,6 +16,7 @@
 
     <div class="swipe-container">
         <div class="question-wrapper">
+            <h3 class="undo">{% trans 'undo' %}</h3>
             <h3 class="no">{% trans 'no' %}</h3>
             <div class="question">
                 <h1>{{ statement }}</h1>
@@ -29,6 +30,7 @@
 
     <p class="help desktop">
         {% trans 'Use your keyboard to answer:' %}
+        <span class="key left">{% trans 'undo' %}</span>
         <span class="key up">{% trans 'yes' %}</span>
         <span class="key down">{% trans 'no' %}</span>
         {% if can_skip %}
@@ -36,7 +38,12 @@
         {% endif %}
     </p>
     <p class="help mobile">
-        {% trans 'Swipe to up and down to reply.' %}
+        {% trans 'Swipe up to reply yes.' %}<br>
+        {% trans 'Swipe down to reply no.' %}<br>
+        {% if can_skip %}
+        {% trans 'Swipe to left to skip.' %}<br>
+        {% endif %}
+        {% trans 'Swipe to right to undo.' %}
     </p>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
