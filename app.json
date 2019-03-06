@@ -1,6 +1,6 @@
 {
-  "name": "Django Heroku Connect Example",
-  "description": "A simple example app for Django and Heroku Connect.",
+  "name": "Threesixty",
+  "description": "The 360-degree feedback tool for winners!",
   "logo": "https://avatars1.githubusercontent.com/u/2737160",
   "keywords": [
     "django",
@@ -15,7 +15,7 @@
       "generator": "secret"
     },
     "WEB_CONCURRENCY": {
-      "description": "The number of processes to run.",
+      "description": "The number of concurrent webserver threads to run.",
       "value": "5"
     }
   },
