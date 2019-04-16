@@ -431,7 +431,7 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': '', 'question': question.pk, 'undo': 'true'}
+            {'decision': None, 'question': question.pk, 'undo': 'true'}
         )
 
         assert response.status_code == 302
