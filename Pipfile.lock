@@ -156,11 +156,11 @@
         },
         "isort": {
             "hashes": [
-                "sha256:1349c6f7c2a0f7539f5f2ace51a9a8e4a37086ce4de6f78f5f53fb041d0a3cd5",
-                "sha256:f09911f6eb114e5592abe635aded8bf3d2c3144ebcfcaf81ee32e7af7b7d1870"
+                "sha256:c40744b6bc5162bbb39c1257fe298b7a393861d50978b565f3ccd9cb9de0182a",
+                "sha256:f57abacd059dc3bd666258d1efb0377510a89777fda3e3274e3c01f7c03ae22d"
             ],
             "index": "pypi",
-            "version": "==4.3.18"
+            "version": "==4.3.20"
         },
         "more-itertools": {
             "hashes": [
