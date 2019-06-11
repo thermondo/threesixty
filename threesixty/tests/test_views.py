@@ -431,12 +431,14 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': None, 'question': question.pk, 'undo': 'true'}
+            {'decision': '', 'question': question.pk, 'undo': 'true'}
         )
 
         assert response.status_code == 302
         assert Answer.objects.count() == 1
-        assert Answer.objects.last().question == question
+        assert Answer.objects.get().pk == answer.pk
+        assert Answer.objects.get().question == question
+        assert Answer.objects.get().decision is None
 
     def test_submit_answer_yes(self, client, db):
         survey = self.create_survey()
