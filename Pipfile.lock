@@ -181,10 +181,11 @@
         },
         "more-itertools": {
             "hashes": [
-                "sha256:558bb897a2232f5e4f8e2399089e35aecb746e1f9191b6584a151647e89267be",
-                "sha256:7818f596b1e87be009031c7653d01acc46ed422e6656b394b0f765ce66ed4982"
+                "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5",
+                "sha256:b78134b2063dd214000685165d81c154522c3ee0a1c0d4d113c80361c234c5a2"
             ],
-            "version": "==8.3.0"
+            "index": "pypi",
+            "version": "==8.4.0"
         },
         "packaging": {
             "hashes": [
@@ -264,7 +265,6 @@
                 "sha256:79375666b9954d4a1a10739315816324c3e73110af9d0e102d906fdb0aec009f",
                 "sha256:8c6b5b6ee1360b842645f336d9e5d68c55817c26d3050f46b235ef2bc650e48f"
             ],
-            "index": "pypi",
             "version": "==0.2.4"
         },
         "zipp": {
