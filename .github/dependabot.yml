@@ -1,0 +1,12 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:30"
+  open-pull-requests-limit: 20
+  allow:
+  - dependency-type: direct
+  - dependency-type: indirect
+  rebase-strategy: disabled
