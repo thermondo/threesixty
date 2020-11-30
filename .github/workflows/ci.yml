@@ -44,3 +44,6 @@ jobs:
 
       - name: tests
         run: pipenv run coverage run --source threesixty -m pytest
+
+      - name: codecov
+        run: pipenv run codecov --required
