@@ -34,7 +34,7 @@ jobs:
           python-version: 3.6
 
       - name: installing pipenv
-        uses: dschep/install-pipenv-action@v1
+        run: pip install pipenv
 
       - name: Install dependecies
         run: pipenv install --dev
