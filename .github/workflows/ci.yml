@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  DATABASE_URL: "postgres://postgres:postgres@localhost/threesixty"
+  SECRET_KEY: super-secret-key
+  DEBUG: "True"
+
+jobs:
+  tests:
+    runs-on: ubuntu-18.04
+    services:
+      postgresql:
+        image: postgres:9.5
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: threesixty
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6.4
+
+      - name: Install dependecies
+        uses: VaultVulp/action-pipenv@v2.0.1
+        with:
+          command: install --dev
+
+      - name: collectstatic
+        uses: VaultVulp/action-pipenv@v2.0.1
+        with:
+          command: run python manage.py collectstatic --no-input
+
+      - name: tests
+        uses: VaultVulp/action-pipenv@v2.0.1
+        with:
+          command: run coverage run --source threesixty -m pytest
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
