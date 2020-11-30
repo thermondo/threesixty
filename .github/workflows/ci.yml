@@ -31,22 +31,19 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6.4
+          python-version: 3.6
+
+      - name: installing pipenv
+        uses: dschep/install-pipenv-action@v1
 
       - name: Install dependecies
-        uses: VaultVulp/action-pipenv@v2.0.1
-        with:
-          command: install --dev
+        run: pipenv install --dev
 
       - name: collectstatic
-        uses: VaultVulp/action-pipenv@v2.0.1
-        with:
-          command: run python manage.py collectstatic --no-input
+        run: pipenv run python manage.py collectstatic --no-input
 
       - name: tests
-        uses: VaultVulp/action-pipenv@v2.0.1
-        with:
-          command: run coverage run --source threesixty -m pytest
+        run: pipenv run coverage run --source threesixty -m pytest
 
       - uses: codecov/codecov-action@v1
         with:
