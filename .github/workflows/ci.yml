@@ -15,7 +15,7 @@ env:
 
 jobs:
   tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     services:
       postgresql:
         image: postgres:9.5
