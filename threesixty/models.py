@@ -73,7 +73,7 @@ class Question(models.Model):
 class Answer(models.Model):
     survey = models.ForeignKey('Survey', on_delete=models.CASCADE)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    decision = models.NullBooleanField(_('decision'))
+    decision = models.BooleanField(_('decision'), null=True)
     participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
     created = models.DateTimeField(_('created'), auto_now_add=True, editable=False)
 

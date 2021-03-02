@@ -76,7 +76,17 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=500),
 }
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+# see https://docs.djangoproject.com/en/dev/ref/middleware/#http-strict-transport-security
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_PRELOAD = True
+
 ATOMIC_REQUESTS = True
+
+SILENCED_SYSTEM_CHECKS = [
+    "security.W005",  # HSTS for subdomains should not be set to not affect other services
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
