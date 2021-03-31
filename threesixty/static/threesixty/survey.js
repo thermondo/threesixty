@@ -47,7 +47,7 @@ class Question {
 
   submitNo () {
     this.answered = true
-    this.select.find('option[value="3"]').attr('selected', 'selected').parent().trigger('change') // 3 = No
+    this.select.find('option[value="false"]').attr('selected', 'selected').parent().trigger('change') // 3 = No
     this.$yes.height(0)
     this.$skip.width(0)
     this.$undo.width(0)
@@ -56,7 +56,7 @@ class Question {
 
   submitYes () {
     this.answered = true
-    this.select.find('option[value="2"]').attr('selected', 'selected').parent().trigger('change') // 2 = Yes
+    this.select.find('option[value="true"]').attr('selected', 'selected').parent().trigger('change') // 2 = Yes
     this.$no.height(0)
     this.$skip.width(0)
     this.$undo.width(0)
@@ -65,7 +65,7 @@ class Question {
 
   submitSkip () {
     this.answered = true
-    this.select.find('option[value="1"]').attr('selected', 'selected').parent().trigger('change') // 1 = Unknown == skip
+    this.select.find('option[value="unknown"]').attr('selected', 'selected').parent().trigger('change') // 1 = Unknown == skip
     this.$no.height(0)
     this.$yes.height(0)
     this.$undo.width(0)
