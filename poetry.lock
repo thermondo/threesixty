@@ -217,7 +217,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "pytest-django"
-version = "4.5.0"
+version = "4.5.1"
 description = "A Django plugin for pytest."
 category = "dev"
 optional = false
@@ -475,8 +475,8 @@ pytest = [
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
 pytest-django = [
-    {file = "pytest-django-4.5.0.tar.gz", hash = "sha256:4b1120c364404cfa9f54e2229b5c39151821bb17819e4bcf357e0f62a3e925a0"},
-    {file = "pytest_django-4.5.0-py3-none-any.whl", hash = "sha256:10cb6e5baacd56ca1f0134ce448b050c31824ba4e480eb7e0fa3832f3a0f8b4c"},
+    {file = "pytest-django-4.5.1.tar.gz", hash = "sha256:01fe1242e706375d7c942d206a30826bd9c0dffde99bfac627050cdc91f0d792"},
+    {file = "pytest_django-4.5.1-py3-none-any.whl", hash = "sha256:13a956a0016cd37f889d5d3a8a36c0c90da44d6fdc7704e4e13f08d2f76f78f7"},
 ]
 pytz = [
     {file = "pytz-2021.3-py2.py3-none-any.whl", hash = "sha256:3672058bc3453457b622aab7a1c3bfd5ab0bdae451512f6cf25f64ed37f5b87c"},
