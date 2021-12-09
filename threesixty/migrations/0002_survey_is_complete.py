@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('threesixty', '0001_initial'),
+        ("threesixty", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='survey',
-            name='is_complete',
-            field=models.BooleanField(default=False, help_text='Will show results and reject further answers.', verbose_name='is complete'),
+            model_name="survey",
+            name="is_complete",
+            field=models.BooleanField(
+                default=False,
+                help_text="Will show results and reject further answers.",
+                verbose_name="is complete",
+            ),
         ),
     ]

@@ -9,25 +9,25 @@ from threesixty.models import Answer, Participant, Question, Survey
 class TestViews:
     def create_survey(self):
         survey = Survey(
-            employee_name='sebastian',
-            employee_gender='male',
-            employee_email='sebastian@mail.com',
-            manager_email='johannes@mail.com',
+            employee_name="sebastian",
+            employee_gender="male",
+            employee_email="sebastian@mail.com",
+            manager_email="johannes@mail.com",
         )
         return survey
 
     def create_participant(self, survey_pk):
         participant = Participant(
-            email='sebastian@mail.com',
+            email="sebastian@mail.com",
             survey_id=survey_pk,
-            relation='self',
+            relation="self",
         )
         return participant
 
     def create_question(self):
         question = Question(
-            text='how good is he?',
-            attribute='porfessionalitaet',
+            text="how good is he?",
+            attribute="porfessionalitaet",
             connotation=True,
         )
         return question
@@ -49,8 +49,8 @@ class TestSurveyDetailView(TestViews):
         response = client.get(survey.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['object'].employee_name == 'sebastian'
-        assert response.context['object'].participant_can_skip is False
+        assert response.context["object"].employee_name == "sebastian"
+        assert response.context["object"].participant_can_skip is False
 
     def test_get_survey_can_skip(self, db, client):
         survey = self.create_survey()
@@ -60,8 +60,8 @@ class TestSurveyDetailView(TestViews):
         response = client.get(survey.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['object'].employee_name == 'sebastian'
-        assert response.context['object'].participant_can_skip is True
+        assert response.context["object"].employee_name == "sebastian"
+        assert response.context["object"].participant_can_skip is True
 
     def test_get_survey_show_question_progress(self, db, client):
         survey = self.create_survey()
@@ -71,8 +71,8 @@ class TestSurveyDetailView(TestViews):
         response = client.get(survey.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['object'].employee_name == 'sebastian'
-        assert response.context['object'].show_question_progress is True
+        assert response.context["object"].employee_name == "sebastian"
+        assert response.context["object"].show_question_progress is True
 
 
 class TestSurveyUpdateView(TestViews):
@@ -84,14 +84,14 @@ class TestSurveyUpdateView(TestViews):
         response = client.get(survey.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['widget']['attrs']['checked']
+        assert response.context["widget"]["attrs"]["checked"]
 
     def test_set_is_complete_true(self, client, db):
         survey = self.create_survey()
         survey.is_complete = False
         survey.save()
 
-        client.post(survey.get_absolute_url(), {'is_complete': 'True'})
+        client.post(survey.get_absolute_url(), {"is_complete": "True"})
 
         assert Survey.objects.get().is_complete
 
@@ -100,7 +100,7 @@ class TestSurveyUpdateView(TestViews):
         survey.is_complete = True
         survey.save()
 
-        client.post(survey.get_absolute_url(), {'is_complete': 'False'})
+        client.post(survey.get_absolute_url(), {"is_complete": "False"})
 
         assert not Survey.objects.get().is_complete
 
@@ -110,16 +110,16 @@ class TestSurveyDataView(TestViews):
         questions = []
         for i in range(1, 4):
             question = Question(
-                text='Question %s' % i,
-                attribute='attribute %s' % i,
+                text="Question %s" % i,
+                attribute="attribute %s" % i,
                 connotation=True,
             )
             question.save()
             questions.append(question)
         for i in range(4, 7):
             question = Question(
-                text='Question %s' % i,
-                attribute='attribute %d' % (i-3),
+                text="Question %s" % i,
+                attribute="attribute %d" % (i - 3),
                 connotation=False,
             )
             question.save()
@@ -128,7 +128,7 @@ class TestSurveyDataView(TestViews):
 
     def create_answer(self, name, relation, questions, survey, modulo):
         participant = Participant(
-            email='%s@mail.com' % name,
+            email="%s@mail.com" % name,
             survey_id=survey.pk,
             relation=relation,
         )
@@ -149,22 +149,22 @@ class TestSurveyDataView(TestViews):
         survey.save()
 
         self.create_answer(
-            name='peter',
-            relation='peer',
+            name="peter",
+            relation="peer",
             questions=questions,
             survey=survey,
             modulo=4,
         )
         self.create_answer(
-            name='george',
-            relation='subordinate',
+            name="george",
+            relation="subordinate",
             questions=questions,
             survey=survey,
             modulo=2,
         )
         self.create_answer(
-            name='sebastian',
-            relation='self',
+            name="sebastian",
+            relation="self",
             questions=questions,
             survey=survey,
             modulo=3,
@@ -176,52 +176,54 @@ class TestSurveyDataView(TestViews):
         survey = self.create_survey_answer_test_data()
 
         url = reverse(
-            'survey-data',
-            kwargs={'pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+            "survey-data",
+            kwargs={"pk": survey.pk, "token": survey.get_token(survey.manager_email)},
         )
 
         response = client.get(url)
 
-        data = json.loads(response.content)['datasets']
-        labels = json.loads(response.content)['labels']
+        data = json.loads(response.content)["datasets"]
+        labels = json.loads(response.content)["labels"]
 
-        results_by_label = {result['label']: result for result in data}
+        results_by_label = {result["label"]: result for result in data}
 
-        result_peer = results_by_label['peer']
-        result_subordinate = results_by_label['subordinate']
-        result_self = results_by_label['self']
-        result_total = results_by_label['total']
-        result_benchmark = results_by_label['benchmark']
+        result_peer = results_by_label["peer"]
+        result_subordinate = results_by_label["subordinate"]
+        result_self = results_by_label["self"]
+        result_total = results_by_label["total"]
+        result_benchmark = results_by_label["benchmark"]
 
-        assert result_peer['label'] == 'peer'
-        result_peer_data = self.group_data_labels(labels, result_peer['data'])
-        assert result_peer_data['attribute 1'] == 1.0
-        assert result_peer_data['attribute 2'] == 0
-        assert result_peer_data['attribute 3'] == 0.5
+        assert result_peer["label"] == "peer"
+        result_peer_data = self.group_data_labels(labels, result_peer["data"])
+        assert result_peer_data["attribute 1"] == 1.0
+        assert result_peer_data["attribute 2"] == 0
+        assert result_peer_data["attribute 3"] == 0.5
 
-        assert result_subordinate['label'] == 'subordinate'
-        result_subordinate_data = self.group_data_labels(labels, result_subordinate['data'])
-        assert result_subordinate_data['attribute 1'] == 1.0
-        assert result_subordinate_data['attribute 2'] == 0.0
-        assert result_subordinate_data['attribute 3'] == 1.0
+        assert result_subordinate["label"] == "subordinate"
+        result_subordinate_data = self.group_data_labels(
+            labels, result_subordinate["data"]
+        )
+        assert result_subordinate_data["attribute 1"] == 1.0
+        assert result_subordinate_data["attribute 2"] == 0.0
+        assert result_subordinate_data["attribute 3"] == 1.0
 
-        assert result_self['label'] == 'self'
-        result_self_data = self.group_data_labels(labels, result_self['data'])
-        assert result_self_data['attribute 1'] == 0.5
-        assert result_self_data['attribute 2'] == 0.5
-        assert result_self_data['attribute 3'] == 0.5
+        assert result_self["label"] == "self"
+        result_self_data = self.group_data_labels(labels, result_self["data"])
+        assert result_self_data["attribute 1"] == 0.5
+        assert result_self_data["attribute 2"] == 0.5
+        assert result_self_data["attribute 3"] == 0.5
 
-        assert result_total['label'] == 'total'
-        result_total_data = self.group_data_labels(labels, result_total['data'])
-        assert result_total_data['attribute 1'] == 1.0
-        assert result_total_data['attribute 2'] == 0.0
-        assert result_total_data['attribute 3'] == 0.75
+        assert result_total["label"] == "total"
+        result_total_data = self.group_data_labels(labels, result_total["data"])
+        assert result_total_data["attribute 1"] == 1.0
+        assert result_total_data["attribute 2"] == 0.0
+        assert result_total_data["attribute 3"] == 0.75
 
-        assert result_benchmark['label'] == 'benchmark'
-        result_benchmark_data = self.group_data_labels(labels, result_benchmark['data'])
-        assert result_benchmark_data['attribute 1'] == 1.0
-        assert result_benchmark_data['attribute 2'] == 0.0
-        assert result_benchmark_data['attribute 3'] == 0.75
+        assert result_benchmark["label"] == "benchmark"
+        result_benchmark_data = self.group_data_labels(labels, result_benchmark["data"])
+        assert result_benchmark_data["attribute 1"] == 1.0
+        assert result_benchmark_data["attribute 2"] == 0.0
+        assert result_benchmark_data["attribute 3"] == 0.75
 
     def group_data_labels(self, labels, data_points):
         """Group labels with data.
@@ -240,8 +242,11 @@ class TestParticipantCreateView(TestViews):
         survey.save()
 
         url = reverse(
-            'survey-invite',
-            kwargs={'survey_pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+            "survey-invite",
+            kwargs={
+                "survey_pk": survey.pk,
+                "token": survey.get_token(survey.manager_email),
+            },
         )
         response = client.get(url)
 
@@ -252,35 +257,38 @@ class TestParticipantCreateView(TestViews):
         survey.save()
 
         url = reverse(
-            'survey-invite',
-            kwargs={'survey_pk': survey.pk, 'token': survey.get_token(survey.manager_email)}
+            "survey-invite",
+            kwargs={
+                "survey_pk": survey.pk,
+                "token": survey.get_token(survey.manager_email),
+            },
         )
-        response = client.post(url, {'email': 'peter@mail.com', 'relation': 'peer'})
+        response = client.post(url, {"email": "peter@mail.com", "relation": "peer"})
 
         assert response.status_code == 302
-        assert mail.outbox[0].recipients()[0] == 'peter@mail.com'
-        assert Participant.objects.get().email == 'peter@mail.com'
+        assert mail.outbox[0].recipients()[0] == "peter@mail.com"
+        assert Participant.objects.get().email == "peter@mail.com"
 
 
 class TestSurveyCreateView(TestViews):
     def test_create_survey(self, client, db):
         response = client.post(
-            '/create',
+            "/create",
             {
-                'employee_name': 'sebastian',
-                'employee_email': 'sebastian@mail.com',
-                'employee_gender': 'male',
-                'manager_email': 'joe@mail.com',
-                'participant_can_skip': 'False',
-                'show_question_progress': 'False',
-            }
+                "employee_name": "sebastian",
+                "employee_email": "sebastian@mail.com",
+                "employee_gender": "male",
+                "manager_email": "joe@mail.com",
+                "participant_can_skip": "False",
+                "show_question_progress": "False",
+            },
         )
 
         assert response.status_code == 302
-        assert 'joe@mail.com' in response.url
+        assert "joe@mail.com" in response.url
 
-        assert mail.outbox[0].recipients()[0] == 'joe@mail.com'
-        assert mail.outbox[1].recipients()[0] == 'sebastian@mail.com'
+        assert mail.outbox[0].recipients()[0] == "joe@mail.com"
+        assert mail.outbox[1].recipients()[0] == "sebastian@mail.com"
 
         assert len(Survey.objects.all()) == 1
 
@@ -294,7 +302,7 @@ class TestAnswerCreateView(TestViews):
         response = client.get(participant.get_absolute_url())
 
         assert response.status_code == 302
-        assert response.url == '/thanks'
+        assert response.url == "/thanks"
 
     def test_get_one_question_left(self, client, db):
         survey = self.create_survey()
@@ -307,10 +315,10 @@ class TestAnswerCreateView(TestViews):
         response = client.get(participant.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['name'] == survey.employee_name
-        assert response.context['statement'] == question.text
-        assert response.context['answered_questions'] == 0
-        assert response.context['total_questions'] == 1
+        assert response.context["name"] == survey.employee_name
+        assert response.context["statement"] == question.text
+        assert response.context["answered_questions"] == 0
+        assert response.context["total_questions"] == 1
 
     def test_form_valid_skip_not_allowed_skip(self, client, db):
         survey = self.create_survey()
@@ -323,7 +331,7 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': 1, 'question': question.pk, 'undo': 'false'}
+            {"decision": 1, "question": question.pk, "undo": "false"},
         )
 
         assert response.status_code == 403
@@ -339,7 +347,7 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': 1, 'question': question.pk, 'undo': 'false'}
+            {"decision": 1, "question": question.pk, "undo": "false"},
         )
 
         assert response.status_code == 302  # since no more questions are left
@@ -353,8 +361,8 @@ class TestAnswerCreateView(TestViews):
         question1 = self.create_question()
         question1.save()
         question2 = Question(
-            text='how goodst is he?',
-            attribute='porfessionalitaet',
+            text="how goodst is he?",
+            attribute="porfessionalitaet",
             connotation=True,
         )
         question2.save()
@@ -365,10 +373,10 @@ class TestAnswerCreateView(TestViews):
         response = client.get(participant.get_absolute_url())
 
         assert response.status_code == 200
-        assert response.context['name'] == survey.employee_name
-        assert response.context['statement'] == question2.text
-        assert response.context['answered_questions'] == 1
-        assert response.context['total_questions'] == 2
+        assert response.context["name"] == survey.employee_name
+        assert response.context["statement"] == question2.text
+        assert response.context["answered_questions"] == 1
+        assert response.context["total_questions"] == 2
 
     def test_get_specific_question(self, client, db):
         survey = self.create_survey()
@@ -380,8 +388,8 @@ class TestAnswerCreateView(TestViews):
         question.save()
 
         question1 = Question(
-            text='h0w good is hes?',
-            attribute='porfessionalitaet',
+            text="h0w good is hes?",
+            attribute="porfessionalitaet",
             connotation=True,
         )
         question1.save()
@@ -389,15 +397,11 @@ class TestAnswerCreateView(TestViews):
         signer = signing.TimestampSigner()
         token = signer.sign(participant.email)
 
-        kwargs = {
-            'survey_pk': survey.pk,
-            'token': token,
-            'question_pk': question.pk
-        }
+        kwargs = {"survey_pk": survey.pk, "token": token, "question_pk": question.pk}
 
-        response = client.get(reverse('surver-answer-specific', kwargs=kwargs))
+        response = client.get(reverse("surver-answer-specific", kwargs=kwargs))
 
-        assert response.context[0]['statement'] == question.text
+        assert response.context[0]["statement"] == question.text
 
     def test_undo(self, client, db):
         survey = self.create_survey()
@@ -409,29 +413,21 @@ class TestAnswerCreateView(TestViews):
         question.save()
 
         question1 = Question(
-            text='h0w good is hes?',
-            attribute='porfessionalitaet',
+            text="h0w good is hes?",
+            attribute="porfessionalitaet",
             connotation=True,
         )
         question1.save()
 
-        answer = Answer(
-            survey=survey,
-            question=question,
-            participant=participant
-        )
+        answer = Answer(survey=survey, question=question, participant=participant)
         answer.save()
 
-        answer1 = Answer(
-            survey=survey,
-            question=question1,
-            participant=participant
-        )
+        answer1 = Answer(survey=survey, question=question1, participant=participant)
         answer1.save()
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': '', 'question': question.pk, 'undo': 'true'}
+            {"decision": "", "question": question.pk, "undo": "true"},
         )
 
         assert response.status_code == 302
@@ -451,7 +447,7 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': 2, 'question': question.pk, 'undo': 'false'}
+            {"decision": 2, "question": question.pk, "undo": "false"},
         )
 
         assert response.status_code == 302
@@ -469,7 +465,7 @@ class TestAnswerCreateView(TestViews):
 
         response = client.post(
             participant.get_absolute_url(),
-            {'decision': 3, 'question': question.pk, 'undo': 'false'}
+            {"decision": 3, "question": question.pk, "undo": "false"},
         )
 
         assert response.status_code == 302

@@ -13,4 +13,3 @@ gettext: $(MSGOBJS)
 
 %.mo: %.po
 	msgfmt -c -o $@ $*.po
-

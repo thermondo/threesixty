@@ -38,7 +38,7 @@ ThreeSixty does not share the results directly with employees. They should be
 only shared in a guided reflection session (1on1-meeting).
 It is important to help the receiver to reflect on feedback to increase
 chances of acceptance. The results should be also accompanied by proposed
-actions. Those actions should help the employee to overcome weaknesses. 
+actions. Those actions should help the employee to overcome weaknesses.
 
 Further reading:
 

@@ -17,21 +17,23 @@ class Command(BaseCommand):
     help = __doc__.strip()
 
     def add_arguments(self, parser):
-        parser.add_argument('CSV', help='URI to CSV file.'
-                                        ' I can be both a file:// or http:// URI.')
+        parser.add_argument(
+            "CSV", help="URI to CSV file." " I can be both a file:// or http:// URI."
+        )
 
     def handle(self, *args, **options):
-        csv_uri = options.get('CSV')
+        csv_uri = options.get("CSV")
 
         response = urllib.request.urlopen(csv_uri)  # nosec
 
         csv_reader = csv.DictReader(chunk.decode() for chunk in response)
         questions = (
             Question(
-                text=row['statement'],
-                attribute=row['attribute'],
-                connotation=row['connotation'] in ['1', 'true', 'positive'],
-            ) for row in csv_reader
+                text=row["statement"],
+                attribute=row["attribute"],
+                connotation=row["connotation"] in ["1", "true", "positive"],
+            )
+            for row in csv_reader
         )
         try:
             Question.objects.bulk_create(questions)

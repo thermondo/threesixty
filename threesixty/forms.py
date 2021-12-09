@@ -9,7 +9,5 @@ class AnswerForm(forms.ModelForm):
 
     class Meta:
         model = models.Answer
-        fields = ['decision', 'question', 'undo']
-        widgets = {
-            'question': forms.HiddenInput
-        }
+        fields = ["decision", "question", "undo"]
+        widgets = {"question": forms.HiddenInput}
