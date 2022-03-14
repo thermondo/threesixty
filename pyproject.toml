@@ -22,7 +22,7 @@ codecov = "*"
 pydocstyle = "^6.1.1"
 flake8 = "^4.0.1"
 black = "^22.1"
-mypy = "^0.931"
+mypy = "^0.940"
 django-stubs = "^1.9.0"
 pre-commit = "^2.17.0"
 
