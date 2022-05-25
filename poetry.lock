@@ -157,7 +157,7 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-stubs"
-version = "1.10.1"
+version = "1.11.0"
 description = "Mypy stubs for Django"
 category = "dev"
 optional = false
@@ -166,7 +166,7 @@ python-versions = ">=3.7"
 [package.dependencies]
 django = "*"
 django-stubs-ext = ">=0.4.0"
-mypy = ">=0.930,<0.950"
+mypy = ">=0.930,<0.960"
 tomli = "*"
 types-pytz = "*"
 types-PyYAML = "*"
@@ -599,7 +599,7 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.4"
-content-hash = "6afec6a79798871e083ca5dcf6b9f7d6ed271465ef250a1b36b9c6147d877c92"
+content-hash = "85b1f7066ded8023cf89abc8786e7382dd3e3ea16890929d2c4fc1b9e53db9fe"
 
 [metadata.files]
 asgiref = [
@@ -720,8 +720,8 @@ django = [
     {file = "Django-4.0.4.tar.gz", hash = "sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5"},
 ]
 django-stubs = [
-    {file = "django-stubs-1.10.1.tar.gz", hash = "sha256:2ec21fc14dba392156e0ec8438e1863c86ddb295f1c8d88eecd7e0e04977c843"},
-    {file = "django_stubs-1.10.1-py3-none-any.whl", hash = "sha256:dfffa933e3c7f5cae92c860fbd6cf4ae58c4f78eed93843612f863207c9e0e1a"},
+    {file = "django-stubs-1.11.0.tar.gz", hash = "sha256:11a4aa094d3da0108d268386dfd0b9a5bf73fe1ab5919b5a292607671329bc4b"},
+    {file = "django_stubs-1.11.0-py3-none-any.whl", hash = "sha256:e9362c0992414560fc6d2f91aa4dd8339b1cbbf7ddacc95b06cc219b1792d217"},
 ]
 django-stubs-ext = [
     {file = "django-stubs-ext-0.4.0.tar.gz", hash = "sha256:3104c4748c34bd741c310a3e6af90dffba46e41bccbe243896e38a708262876b"},
