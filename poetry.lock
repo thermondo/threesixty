@@ -587,7 +587,7 @@ testing = ["pytest", "pytest-cover", "coverage (>=5.0)"]
 
 [[package]]
 name = "whitenoise"
-version = "6.1.0"
+version = "6.2.0"
 description = "Radically simplified static file serving for WSGI applications"
 category = "main"
 optional = false
@@ -982,6 +982,6 @@ waitress = [
     {file = "waitress-2.1.2.tar.gz", hash = "sha256:780a4082c5fbc0fde6a2fcfe5e26e6efc1e8f425730863c04085769781f51eba"},
 ]
 whitenoise = [
-    {file = "whitenoise-6.1.0-py3-none-any.whl", hash = "sha256:2067fe9008a3cd7d0d75f75c9240b54f5f59996ca285cbeab18fc1e89949e30d"},
-    {file = "whitenoise-6.1.0.tar.gz", hash = "sha256:6ccc6d1ad6fb688a398ea65d97db47f018ea0be7da75e146e8f2e837a04ba590"},
+    {file = "whitenoise-6.2.0-py3-none-any.whl", hash = "sha256:8e9c600a5c18bd17655ef668ad55b5edf6c24ce9bdca5bf607649ca4b1e8e2c2"},
+    {file = "whitenoise-6.2.0.tar.gz", hash = "sha256:8fa943c6d4cd9e27673b70c21a07b0aa120873901e099cd46cab40f7cc96d567"},
 ]
