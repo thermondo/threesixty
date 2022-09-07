@@ -327,12 +327,6 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
         return initial
 
     def form_valid(self, form):
-        if (
-            not self.survey.participant_can_skip
-            and form.cleaned_data["decision"] is None
-        ):
-            return HttpResponseForbidden()
-
         if form.data["undo"] == "true":
             try:
                 latest_answer = models.Answer.objects.filter(
@@ -349,12 +343,17 @@ class AnswerCreateView(WithEmailTokenMixin, SurveyViewMixin, generic.CreateView)
                 )
             except models.Answer.DoesNotExist:
                 return self.redirect_survey_answer(self.survey.pk, self.token)
-        else:
+        elif (
+            form.cleaned_data["decision"] is not None
+            or self.survey.participant_can_skip
+        ):
             self.object = form.save(commit=False)
             self.object.participant = self.participant
             self.object.survey = self.survey
             self.object.save()
             return HttpResponseRedirect(self.request.path)
+        else:
+            return HttpResponseForbidden()
 
     def redirect_survey_answer(self, survey_pk, token):
         kwargs = {
