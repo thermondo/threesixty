@@ -471,3 +471,36 @@ class TestAnswerCreateView(TestViews):
         assert response.status_code == 302
         assert Answer.objects.count() == 1
         assert not Answer.objects.last().decision
+
+    def test_undo_with_no_skip(self, client, db):
+        survey = self.create_survey()
+        survey.participant_can_skip = False
+        survey.save()
+        participant = self.create_participant(survey.pk)
+        participant.save()
+        question = self.create_question()
+        question.save()
+
+        question1 = Question(
+            text="h0w good is hes?",
+            attribute="porfessionalitaet",
+            connotation=True,
+        )
+        question1.save()
+
+        answer = Answer(survey=survey, question=question, participant=participant)
+        answer.save()
+
+        answer1 = Answer(survey=survey, question=question1, participant=participant)
+        answer1.save()
+
+        response = client.post(
+            participant.get_absolute_url(),
+            {"decision": "", "question": question.pk, "undo": "true"},
+        )
+
+        assert response.status_code == 302
+        assert Answer.objects.count() == 1
+        assert Answer.objects.get().pk == answer.pk
+        assert Answer.objects.get().question == question
+        assert Answer.objects.get().decision is None
