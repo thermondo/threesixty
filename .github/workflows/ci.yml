@@ -28,16 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3.3.0
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10.7
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.3
-        with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+          python-version: 3.11.2
+          cache: 'poetry'
 
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
