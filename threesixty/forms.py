@@ -4,7 +4,6 @@ from . import models
 
 
 class AnswerForm(forms.ModelForm):
-
     undo = forms.BooleanField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
