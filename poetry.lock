@@ -927,14 +927,14 @@ files = [
 
 [[package]]
 name = "types-pytz"
-version = "2023.2.0.0"
+version = "2023.3.0.0"
 description = "Typing stubs for pytz"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-pytz-2023.2.0.0.tar.gz", hash = "sha256:eec7c806220776cde7b2fb20371853ddd0d14fa7544ca3c6862433ade37469df"},
-    {file = "types_pytz-2023.2.0.0-py3-none-any.whl", hash = "sha256:a6cca439e1f87be0ce745181543b58587f4e685d6b14627255dced68004ba05e"},
+    {file = "types-pytz-2023.3.0.0.tar.gz", hash = "sha256:ecdc70d543aaf3616a7e48631543a884f74205f284cefd6649ddf44c6a820aac"},
+    {file = "types_pytz-2023.3.0.0-py3-none-any.whl", hash = "sha256:4fc2a7fbbc315f0b6630e0b899fd6c743705abe1094d007b0e612d10da15e0f3"},
 ]
 
 [[package]]
